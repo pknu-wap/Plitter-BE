@@ -12,8 +12,6 @@ assignees: ''
 >
 
 ## ✅ TO-DO
-- [ ] todo1
-- [ ] todo2
-- [ ] todo3
+- [ ] todo
 
 ## ➕ETC
