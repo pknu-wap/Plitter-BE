@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@Table(name = "playlist")
 public class PlaylistEntity {
 
     @Id
@@ -18,8 +19,8 @@ public class PlaylistEntity {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_user_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_user_id", nullable = false, unique = true)
     private Users owner;
 
     @Column(name = "short_id", nullable = false, length = 20)
