@@ -20,8 +20,8 @@ public class PlaylistService {
         System.out.println("레포지토리 접근 종료 !!");
 
         Long playlistId = saved.getId();
-        String shortId = "temp";
-        String shareUrl = "temp";
+        String shortId = "temp"; // 🧐 수정 필요
+        String shareUrl = "temp"; // 🧐 수정 필요
 
         System.out.println("서비스 종료 !!");
         return new PlaylistCreateResponse(playlistId, shortId, shareUrl);
