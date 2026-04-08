@@ -1,5 +1,6 @@
 package com.playlist.plitter.playlist.domain.entity;
 
+import com.playlist.plitter.auth.domain.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -16,21 +17,21 @@ public class PlaylistEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", updatable = false)
+    @Column(name = "playlist_id", updatable = false)
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_user_id", nullable = false, unique = true)
-    private Users owner;
+    private UserEntity owner;
 
     @Column(name = "short_id", nullable = false, length = 20)
-    private String short_id;
+    private String shortId;
 
     @Column(name = "recommendation_count", nullable = false)
-    private Integer recommendation_count;
+    private int recommendationCount;
 
     @Column(name = "character_version", nullable = false)
-    private Integer character_version;
+    private int characterVersion;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
