@@ -47,11 +47,11 @@ public class PlaylistController {
 
         String shortId = UUID.randomUUID().toString().substring(0, 8);
 
-        PlaylistEntity playlist = new PlaylistEntity();
-        playlist.setOwner(user);
-        playlist.setCharacter_version(1);
-        playlist.setRecommendation_count(0);
-        playlist.setShort_id(shortId);
+        PlaylistEntity playlist = PlaylistEntity.builder()
+                .owner(user)
+                .shortId(shortId)
+                .characterVersion(1)
+                .build();
 
 
         PlaylistCreateResponse response = playlistService.savePlaylist(playlist);
