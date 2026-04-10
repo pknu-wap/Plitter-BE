@@ -13,16 +13,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class KakaoUserEntity {
 
-    @Builder
-    public KakaoUserEntity(String kakaoId, String nickname) {
-        this.kakaoId = kakaoId;
-        this.nickname = nickname;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "kakao_id", nullable = false, length = 100)
@@ -36,5 +29,13 @@ public class KakaoUserEntity {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @Builder
+    public KakaoUserEntity(String kakaoId, String nickname) {
+        this.kakaoId = kakaoId;
+        this.nickname = nickname;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
 
 }
