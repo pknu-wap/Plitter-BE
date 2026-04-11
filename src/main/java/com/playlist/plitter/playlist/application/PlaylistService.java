@@ -6,6 +6,8 @@ import com.playlist.plitter.playlist.domain.repository.PlaylistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class PlaylistService {
 
@@ -20,7 +22,7 @@ public class PlaylistService {
         System.out.println("레포지토리 접근 종료 !!");
 
         Long playlistId = saved.getId();
-        String shortId = "temp"; // 🧐 수정 필요
+        String shortId = UUID.randomUUID().toString().substring(0, 5);
         String shareUrl = "temp"; // 🧐 수정 필요
 
         System.out.println("서비스 종료 !!");
