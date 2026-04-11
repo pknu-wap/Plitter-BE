@@ -23,7 +23,7 @@ public class PlaylistService {
 
         Long playlistId = saved.getId();
         String shortId = UUID.randomUUID().toString().substring(0, 5);
-        String shareUrl = "temp"; // 🧐 수정 필요
+        String shareUrl = "https://ourdomain.com/playlist/" + shortId;
 
         System.out.println("서비스 종료 !!");
         return new PlaylistCreateResponse(playlistId, shortId, shareUrl);
