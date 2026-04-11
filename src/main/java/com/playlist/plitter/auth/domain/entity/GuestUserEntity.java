@@ -1,18 +1,24 @@
 package com.playlist.plitter.auth.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Table(name = "guest_sessions")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 
-public class UserEntity {
+
+public class GuestUserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,11 +34,12 @@ public class UserEntity {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     @Builder
-    public UserEntity(String guestToken, String randomNickname) {
+    public GuestUserEntity(String guestToken, String randomNickname) {
         this.guestToken = guestToken;
         this.randomNickname = randomNickname;
     }
