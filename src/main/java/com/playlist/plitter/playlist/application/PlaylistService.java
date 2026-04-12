@@ -38,7 +38,7 @@ public class PlaylistService {
         PlaylistEntity saved = playlistRepository.save(playlist);
 
         Long playlistId = saved.getId();
-        String shareUrl = "https://ourdomain.com/playlist/" + shortId;
+        String shareUrl = "https://ourdomain.com/playlist/" + saved.getShortId();
 
         return new PlaylistCreateResponse(playlistId, shortId, shareUrl);
     }
