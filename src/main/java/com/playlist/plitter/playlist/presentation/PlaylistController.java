@@ -33,25 +33,7 @@ public class PlaylistController {
         ) {
         Long userId = 1L; // 🧐 TODO: JWT 토큰에서 userId 추출
 
-        System.out.println("user id = " + userId);
-
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("유저 없음"));
-
-        if (playlistRepository.existsByOwner(user)) {
-            throw new ApiException(PlaylistErrorCode.PLAYLIST_ALREADY_EXISTS);
-        }
-
-        String shortId = UUID.randomUUID().toString().substring(0, 8);
-
-        PlaylistEntity playlist = PlaylistEntity.builder()
-                .owner(user)
-                .shortId(shortId)
-                .characterVersion(1)
-                .build();
-
-
-        PlaylistCreateResponse response = playlistService.savePlaylist(playlist);
+        PlaylistCreateResponse response = playlistService.savePlaylist(userId);
         return ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, response);
     }
 }
