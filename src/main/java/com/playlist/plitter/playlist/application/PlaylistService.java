@@ -15,17 +15,13 @@ public class PlaylistService {
     PlaylistRepository playlistRepository;
 
     public PlaylistCreateResponse savePlaylist(PlaylistEntity playlist) {
-        System.out.println("서비스 시작 !!");
 
-        System.out.println("레포지토리 접근 시작 !!");
         PlaylistEntity saved = playlistRepository.save(playlist);
-        System.out.println("레포지토리 접근 종료 !!");
 
         Long playlistId = saved.getId();
         String shortId = UUID.randomUUID().toString().substring(0, 5);
         String shareUrl = "https://ourdomain.com/playlist/" + shortId;
 
-        System.out.println("서비스 종료 !!");
         return new PlaylistCreateResponse(playlistId, shortId, shareUrl);
     }
 
