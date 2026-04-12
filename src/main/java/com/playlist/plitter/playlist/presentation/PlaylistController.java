@@ -6,15 +6,13 @@ import com.playlist.plitter.global.dto.ResponseDto;
 import com.playlist.plitter.global.dto.SuccessMessage;
 import com.playlist.plitter.global.exception.ApiException;
 import com.playlist.plitter.playlist.application.PlaylistService;
+import com.playlist.plitter.playlist.application.dto.PlaylistCheckResponse;
 import com.playlist.plitter.playlist.application.dto.PlaylistCreateResponse;
 import com.playlist.plitter.playlist.domain.entity.PlaylistEntity;
 import com.playlist.plitter.playlist.domain.repository.PlaylistRepository;
 import com.playlist.plitter.playlist.exception.PlaylistErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -36,4 +34,15 @@ public class PlaylistController {
         PlaylistCreateResponse response = playlistService.savePlaylist(userId);
         return ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, response);
     }
+
+    @GetMapping("/playlists/check")
+    public ResponseDto<PlaylistCheckResponse> checkPlaylist(
+            @RequestHeader("Authorization") String token
+        ) {
+        Long userId = 1L; // 🧐 TODO: JWT 토큰에서 userId 추출
+
+        PlaylistCheckResponse response = playlistService.checkPlaylist(userId);
+        return ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, response);
+    }
+
 }
