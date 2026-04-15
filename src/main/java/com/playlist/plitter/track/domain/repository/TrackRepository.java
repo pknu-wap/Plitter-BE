@@ -1,4 +1,9 @@
 package com.playlist.plitter.track.domain.repository;
 
-public class TrackRepository {
+import com.playlist.plitter.track.domain.entity.TrackEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface TrackRepository extends JpaRepository<TrackEntity, Long> {
 }
