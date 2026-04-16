@@ -1,4 +1,4 @@
-package com.playlist.plitter.auth.domain.entity;
+package com.playlist.plitter.auth.kakao.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -14,15 +14,17 @@ import java.time.LocalDateTime;
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserEntity {
+public class KakaoUserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
+    @Column(name = "kakao_id", nullable = false, length = 100)
+    private String kakaoId;
+
+    @Column(nullable = false, length = 50)
+    private String nickname;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -33,11 +35,9 @@ public class UserEntity {
     private LocalDateTime updatedAt;
 
     @Builder
-    public UserEntity(Role role) {
-        this.role = role;
+    public KakaoUserEntity(String kakaoId, String nickname) {
+        this.kakaoId = kakaoId;
+        this.nickname = nickname;
     }
 
-    public enum Role {
-        USER, ADMIN
-    }
 }
