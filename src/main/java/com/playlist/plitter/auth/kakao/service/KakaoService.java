@@ -1,6 +1,9 @@
 package com.playlist.plitter.auth.kakao.service;
 
 import com.playlist.plitter.auth.kakao.dto.KakaoTokenResponseDto;
+import com.playlist.plitter.auth.kakao.dto.KakaoUserInfoDto;
+import com.playlist.plitter.auth.kakao.entity.KakaoUserEntity;
+import com.playlist.plitter.auth.kakao.repository.KakaoUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -13,6 +16,8 @@ import org.springframework.web.client.RestClient;
 @RequiredArgsConstructor
 public class KakaoService {
 
+    private final KakaoUserRepository kakaoUserRepository;
+
     @Value("${kakao.client-id}")
     private String clientId;
 
@@ -24,6 +29,9 @@ public class KakaoService {
 
     @Value("${kakao.token-url}")
     private String tokenUrl;
+
+    @Value("${kakao.user-info-url}")
+    private String userInfoUrl;
 
     public String getKakaoLoginUrl() {
         return authUrl
@@ -46,5 +54,24 @@ public class KakaoService {
                 .body(params)
                 .retrieve()
                 .body(KakaoTokenResponseDto.class);
+    }
+
+    public KakaoUserInfoDto getKakaoUserInfo(String accessToken) {
+        return RestClient.create()
+                .get()
+                .uri(userInfoUrl)
+                .header("Authorization", "Bearer " + accessToken)
+                .retrieve()
+                .body(KakaoUserInfoDto.class);
+    }
+
+    public KakaoUserEntity saveOrUpdateUser(KakaoUserInfoDto userInfo) {
+        return kakaoUserRepository.findByKakaoId(userInfo.getKakaoId())
+                .orElseGet(() -> kakaoUserRepository.save(
+                        KakaoUserEntity.builder()
+                                .kakaoId(userInfo.getKakaoId())
+                                .nickname(userInfo.getNickname())
+                                .build()
+                ));
     }
 }

@@ -27,6 +27,7 @@ public class KakaoController {
     @GetMapping("/callback")
     public ResponseEntity<ResponseDto<KakaoTokenResponseDto>> kakaoCallback(@RequestParam String code) {
         KakaoTokenResponseDto token = kakaoService.getKakaoToken(code);
+        kakaoService.saveOrUpdateUser(kakaoService.getKakaoUserInfo(token.getAccessToken()));
         return ResponseEntity.ok(ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, token));
     }
 }
