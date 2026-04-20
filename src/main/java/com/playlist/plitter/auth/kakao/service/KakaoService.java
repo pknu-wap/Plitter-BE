@@ -67,6 +67,10 @@ public class KakaoService {
 
     public KakaoUserEntity saveOrUpdateUser(KakaoUserInfoDto userInfo) {
         return kakaoUserRepository.findByKakaoId(userInfo.getKakaoId())
+                .map(user -> {
+                    user.updateNickname(userInfo.getNickname());
+                    return kakaoUserRepository.save(user);
+                })
                 .orElseGet(() -> kakaoUserRepository.save(
                         KakaoUserEntity.builder()
                                 .kakaoId(userInfo.getKakaoId())
