@@ -1,5 +1,6 @@
 package com.playlist.plitter.auth.kakao.controller;
 
+import com.playlist.plitter.auth.kakao.dto.KakaoTokenResponseDto;
 import com.playlist.plitter.auth.kakao.service.KakaoService;
 import com.playlist.plitter.global.dto.ResponseDto;
 import com.playlist.plitter.global.dto.SuccessMessage;
@@ -7,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -20,5 +22,11 @@ public class KakaoController {
     public ResponseEntity<ResponseDto<String>> kakaoLogin() {
         String loginUrl = kakaoService.getKakaoLoginUrl();
         return ResponseEntity.ok(ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, loginUrl));
+    }
+
+    @GetMapping("/callback")
+    public ResponseEntity<ResponseDto<KakaoTokenResponseDto>> kakaoCallback(@RequestParam String code) {
+        KakaoTokenResponseDto token = kakaoService.getKakaoToken(code);
+        return ResponseEntity.ok(ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, token));
     }
 }
