@@ -2,10 +2,12 @@ package com.playlist.plitter.character.application;
 
 import com.playlist.plitter.character.domain.entity.CharacterEntity;
 import com.playlist.plitter.character.domain.repository.CharacterRepository;
+import com.playlist.plitter.character.exception.CharacterErrorCode;
 import com.playlist.plitter.character.presentation.dto.response.CharacterAvailabilityResponse;
 import com.playlist.plitter.character.presentation.dto.response.CharacterCreateResponse;
 import com.playlist.plitter.character.presentation.dto.response.CharacterDetailResponse;
 import com.playlist.plitter.character.presentation.dto.response.CharacterDownloadUrlResponse;
+import com.playlist.plitter.global.exception.ApiException;
 import com.playlist.plitter.playlist.domain.entity.PlaylistEntity;
 import com.playlist.plitter.playlist.domain.repository.PlaylistRepository;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +45,7 @@ public class CharacterService {
         CharacterAvailabilityResponse availability = getAvailability(playlistId);
 
         if (!availability.available()) {
-            throw new IllegalStateException("Not enough recommendations to create character");
+            throw new ApiException(CharacterErrorCode.CHARACTER_NOT_AVAILABLE);
         }
 
         int nextVersion = characterRepository.findTopByPlaylist_IdOrderByVersionDesc(playlistId)
@@ -78,13 +80,13 @@ public class CharacterService {
 
     private PlaylistEntity getPlaylistOrThrow(Long playlistId) {
         return playlistRepository.findById(playlistId)
-                .orElseThrow(() -> new IllegalArgumentException("Playlist not found: " + playlistId));
+                .orElseThrow(() -> new ApiException(CharacterErrorCode.PLAYLIST_NOT_FOUND));
     }
 
     private CharacterEntity getLatestCharacterOrThrow(Long playlistId) {
         getPlaylistOrThrow(playlistId);
         return characterRepository.findTopByPlaylist_IdOrderByVersionDesc(playlistId)
-                .orElseThrow(() -> new IllegalArgumentException("Character not found for playlist: " + playlistId));
+                .orElseThrow(() -> new ApiException(CharacterErrorCode.CHARACTER_NOT_FOUND));
     }
 
     private String buildFeatureSummaryJson(PlaylistEntity playlist) {
