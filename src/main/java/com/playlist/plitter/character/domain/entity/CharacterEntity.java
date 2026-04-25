@@ -22,8 +22,8 @@ public class CharacterEntity {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "playlist_id", nullable = false, unique = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "playlist_id", nullable = false)
     private PlaylistEntity playlist;
 
     @Column(name = "version", nullable = false)
