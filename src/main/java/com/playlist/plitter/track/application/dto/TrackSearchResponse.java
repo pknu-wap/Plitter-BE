@@ -1,13 +1,10 @@
 package com.playlist.plitter.track.application.dto;
 
-import java.time.LocalDateTime;
-
 public record TrackSearchResponse(
-        String trackId,
+        String spotifyId,
         String title,
         String artistName,
-        String albumName,
-        String albumCoverUrl,
+        String albumCoverImageUrl,
         String previewUrl,
         String spotifyUrl
 ) {

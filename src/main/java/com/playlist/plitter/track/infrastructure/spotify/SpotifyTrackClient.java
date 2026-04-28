@@ -1,6 +1,8 @@
 package com.playlist.plitter.track.infrastructure.spotify;
 
+import com.playlist.plitter.global.exception.ApiException;
 import com.playlist.plitter.track.application.dto.TrackSearchResponse;
+import com.playlist.plitter.track.exception.TrackErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -12,6 +14,7 @@ import se.michaelthelin.spotify.model_objects.specification.Image;
 import se.michaelthelin.spotify.model_objects.specification.Track;
 import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 import se.michaelthelin.spotify.requests.data.search.SearchItemRequest;
+import se.michaelthelin.spotify.exceptions.detailed.UnauthorizedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +67,6 @@ public class SpotifyTrackClient {
                         track.getId(),
                         track.getName(),
                         artistName,
-                        track.getAlbum().getName(),
                         albumImageUrl,
                         track.getPreviewUrl(),
                         spotifyUrl
@@ -72,8 +74,10 @@ public class SpotifyTrackClient {
             }
 
             return result;
+        } catch (UnauthorizedException e) {
+            throw new ApiException(TrackErrorCode.SPOTIFY_UNAUTHORIZED);
         } catch (Exception e) {
-            throw new RuntimeException("Spotify 트랙 검색 중 오류가 발생했습니다.", e);
+            throw new ApiException(TrackErrorCode.TRACK_SEARCH_FAILED);
         }
     }
 }
