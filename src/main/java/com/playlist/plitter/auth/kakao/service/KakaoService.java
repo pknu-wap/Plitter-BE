@@ -3,7 +3,9 @@ package com.playlist.plitter.auth.kakao.service;
 import com.playlist.plitter.auth.kakao.dto.KakaoTokenResponseDto;
 import com.playlist.plitter.auth.kakao.dto.KakaoUserInfoDto;
 import com.playlist.plitter.auth.kakao.entity.KakaoUserEntity;
+import com.playlist.plitter.auth.kakao.exception.KakaoErrorCode;
 import com.playlist.plitter.auth.kakao.repository.KakaoUserRepository;
+import com.playlist.plitter.global.exception.ApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -47,22 +49,30 @@ public class KakaoService {
         params.add("redirect_uri", redirectUri);
         params.add("code", code);
 
-        return RestClient.create()
-                .post()
-                .uri(tokenUrl)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body(params)
-                .retrieve()
-                .body(KakaoTokenResponseDto.class);
+        try {
+            return RestClient.create()
+                    .post()
+                    .uri(tokenUrl)
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .body(params)
+                    .retrieve()
+                    .body(KakaoTokenResponseDto.class);
+        } catch (Exception e) {
+            throw new ApiException(KakaoErrorCode.KAKAO_TOKEN_FAILED);
+        }
     }
 
     public KakaoUserInfoDto getKakaoUserInfo(String accessToken) {
-        return RestClient.create()
-                .get()
-                .uri(userInfoUrl)
-                .header("Authorization", "Bearer " + accessToken)
-                .retrieve()
-                .body(KakaoUserInfoDto.class);
+        try {
+            return RestClient.create()
+                    .get()
+                    .uri(userInfoUrl)
+                    .header("Authorization", "Bearer " + accessToken)
+                    .retrieve()
+                    .body(KakaoUserInfoDto.class);
+        } catch (Exception e) {
+            throw new ApiException(KakaoErrorCode.KAKAO_USER_INFO_FAILED);
+        }
     }
 
     public KakaoUserEntity saveOrUpdateUser(KakaoUserInfoDto userInfo) {
