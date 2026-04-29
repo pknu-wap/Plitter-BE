@@ -5,6 +5,7 @@ import com.playlist.plitter.global.dto.SuccessMessage;
 import com.playlist.plitter.recommendations.application.RecommendationsService;
 import com.playlist.plitter.recommendations.application.dto.RecommendationCreateRequest;
 import com.playlist.plitter.recommendations.application.dto.RecommendationCreateResponse;
+import com.playlist.plitter.recommendations.application.dto.RecommendationDetailResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +22,14 @@ public class RecommendationsController {
             @RequestBody RecommendationCreateRequest request
     ) {
         RecommendationCreateResponse response = recommendationsService.createRecommendation(playlistId, request);
+        return ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, response);
+    }
+
+    @GetMapping("/recommendations/{recommendationId}")
+    public ResponseDto<RecommendationDetailResponse> getRecommendationDetail(
+            @PathVariable Long recommendationId
+    ) {
+        RecommendationDetailResponse response = recommendationsService.getRecommendationDetail(recommendationId);
         return ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, response);
     }
 }
