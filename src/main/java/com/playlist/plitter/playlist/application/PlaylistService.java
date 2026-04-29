@@ -5,6 +5,7 @@ import com.playlist.plitter.playlist.domain.entity.PlaylistEntity;
 import com.playlist.plitter.playlist.domain.repository.PlaylistRepository;
 import com.playlist.plitter.auth.domain.entity.UserEntity;
 import com.playlist.plitter.auth.domain.repository.UserRepository;
+import com.playlist.plitter.auth.exception.AuthErrorCode;
 import com.playlist.plitter.global.exception.ApiException;
 import com.playlist.plitter.playlist.exception.PlaylistErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class PlaylistService {
     public PlaylistCreateResponse savePlaylist(Long userId) {
 
         UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("유저 없음"));
+                .orElseThrow(() -> new ApiException(AuthErrorCode.USER_NOT_FOUND));
 
         if (playlistRepository.existsByOwner(user)) {
             throw new ApiException(PlaylistErrorCode.PLAYLIST_ALREADY_EXISTS);

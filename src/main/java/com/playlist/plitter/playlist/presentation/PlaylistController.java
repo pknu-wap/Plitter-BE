@@ -31,7 +31,7 @@ public class PlaylistController {
     public ResponseDto<PlaylistCreateResponse> createPlaylist(
             @RequestHeader("Authorization") String token
         ) {
-        Long userId = 1L; // 🧐 TODO: JWT 토큰에서 userId 추출
+        Long userId = 1L; // TODO: JWT 토큰에서 userId 추출
 
         PlaylistCreateResponse response = playlistService.savePlaylist(userId);
         return ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, response);
