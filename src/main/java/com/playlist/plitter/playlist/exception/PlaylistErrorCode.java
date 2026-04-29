@@ -4,7 +4,8 @@ import com.playlist.plitter.global.exception.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 public enum PlaylistErrorCode implements ErrorCode {
-    PLAYLIST_ALREADY_EXISTS(HttpStatus.CONFLICT, "플레이리스트가 이미 존재합니다.", "PLAYLIST_ALREADY_EXISTS");
+    PLAYLIST_ALREADY_EXISTS(HttpStatus.CONFLICT, "플레이리스트가 이미 존재합니다.", "PLAYLIST_ALREADY_EXISTS"),
+    PLAYLIST_NOT_FOUND(HttpStatus.NOT_FOUND, "플레이리스트를 찾을 수 없습니다.", "PLAYLIST_NOT_FOUND");
 
     private final HttpStatus httpStatus;
     private final String message;
