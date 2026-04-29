@@ -45,4 +45,28 @@ public class CharacterEntity {
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    private CharacterEntity(
+            PlaylistEntity playlist,
+            int version,
+            String imageUrl,
+            String promptText,
+            String featureSummaryJson
+    ) {
+        this.playlist = playlist;
+        this.version = version;
+        this.imageUrl = imageUrl;
+        this.promptText = promptText;
+        this.featureSummaryJson = featureSummaryJson;
+    }
+
+    public static CharacterEntity create(
+            PlaylistEntity playlist,
+            int version,
+            String imageUrl,
+            String promptText,
+            String featureSummaryJson
+    ) {
+        return new CharacterEntity(playlist, version, imageUrl, promptText, featureSummaryJson);
+    }
 }
