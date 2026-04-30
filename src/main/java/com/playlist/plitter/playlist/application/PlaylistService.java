@@ -18,6 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import com.playlist.plitter.auth.exception.AuthErrorCode;
+import com.playlist.plitter.global.exception.ApiException;
+import com.playlist.plitter.playlist.exception.PlaylistErrorCode;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
@@ -26,12 +31,11 @@ public class PlaylistService {
 
     private final PlaylistRepository playlistRepository;
     private final UserRepository userRepository;
-    private final RecommendationsRepository recommendationsRepository;
 
     public PlaylistCreateResponse savePlaylist(Long userId) {
 
         UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("유저 없음"));
+                .orElseThrow(() -> new ApiException(AuthErrorCode.USER_NOT_FOUND));
 
         if (playlistRepository.existsByOwner(user)) {
             throw new ApiException(PlaylistErrorCode.PLAYLIST_ALREADY_EXISTS);
