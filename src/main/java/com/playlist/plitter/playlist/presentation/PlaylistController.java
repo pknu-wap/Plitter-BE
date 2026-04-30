@@ -43,7 +43,7 @@ public class PlaylistController {
     public ResponseDto<PlaylistCheckResponse> checkPlaylist(
             @RequestHeader("Authorization") String token
         ) {
-        Long userId = 1L; // 🧐 TODO: JWT 토큰에서 userId 추출
+        Long userId = 1L; // TODO: JWT 토큰에서 userId 추출
 
         PlaylistCheckResponse response = playlistService.checkPlaylist(userId);
         return ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, response);
