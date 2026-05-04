@@ -79,7 +79,7 @@ public class PlaylistService {
         return new PlaylistResponse(
                 playlist.getId(),
                 recommendations.size(),
-                recommendations.size() >= 30,
+                recommendations.size() >= 10,
                 recommendations
         );
     }

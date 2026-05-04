@@ -31,6 +31,14 @@ public class RecommendationsService {
         PlaylistEntity playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new RuntimeException("플레이리스트를 찾을 수 없습니다."));
 
+        if (recommendationsRepository.existsByPlaylistAndTrack_SpotifyTrackIdAndComment(
+                playlist,
+                request.spotifyId(),
+                request.comment()
+        )) {
+            throw new ApiException(RecommendationsErrorCode.DUPLICATE_RECOMMENDATION);
+        }
+
         TrackEntity track = TrackEntity.builder()
                 .spotifyTrackId(request.spotifyId())
                 .title(request.title())
