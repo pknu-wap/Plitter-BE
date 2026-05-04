@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class RecommendationsService {
@@ -72,6 +74,14 @@ public class RecommendationsService {
         RecommendationsEntity recommendation = recommendationsRepository.findById(recommendationId)
                 .orElseThrow(() -> new ApiException(RecommendationsErrorCode.RECOMMENDATION_NOT_FOUND));
 
-        return RecommendationDetailResponse.from(recommendation);
+        List<String> comments = recommendationsRepository.findAllByPlaylistAndTrack_SpotifyTrackId(
+                        recommendation.getPlaylist(),
+                        recommendation.getTrack().getSpotifyTrackId()
+                )
+                .stream()
+                .map(RecommendationsEntity::getComment)
+                .toList();
+
+        return RecommendationDetailResponse.from(recommendation, comments);
     }
 }

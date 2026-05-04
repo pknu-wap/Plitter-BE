@@ -11,6 +11,11 @@ import java.util.List;
 public interface RecommendationsRepository extends JpaRepository<RecommendationsEntity, Long> {
     List<RecommendationsEntity> findAllByPlaylist(PlaylistEntity playlist);
 
+    List<RecommendationsEntity> findAllByPlaylistAndTrack_SpotifyTrackId(
+            PlaylistEntity playlist,
+            String spotifyTrackId
+    );
+
     boolean existsByPlaylistAndTrack_SpotifyTrackIdAndComment(
             PlaylistEntity playlist,
             String spotifyTrackId,
