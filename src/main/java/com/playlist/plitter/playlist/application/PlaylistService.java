@@ -31,6 +31,7 @@ public class PlaylistService {
 
     private final PlaylistRepository playlistRepository;
     private final UserRepository userRepository;
+    private final RecommendationsRepository recommendationsRepository;
 
     public PlaylistCreateResponse savePlaylist(Long userId) {
 

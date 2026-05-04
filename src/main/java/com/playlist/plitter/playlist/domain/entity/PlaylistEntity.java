@@ -22,9 +22,9 @@ public class PlaylistEntity {
     @Column(name = "playlist_id", updatable = false)
     private Long id;
 
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "owner_user_id", nullable = false, unique = true)
-//    private UserEntity owner;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_user_id", nullable = false, unique = true)
+    private UserEntity owner;
 
     @Column(name = "short_id", nullable = false, length = 20, unique = true)
     private String shortId;
@@ -46,7 +46,7 @@ public class PlaylistEntity {
 
     @Builder
     public PlaylistEntity(UserEntity owner, String shortId, int characterVersion) {
-//        this.owner = owner;
+        this.owner = owner;
         this.shortId = shortId;
         this.characterVersion = characterVersion;
     }
