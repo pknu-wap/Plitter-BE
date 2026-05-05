@@ -1,5 +1,8 @@
 package com.playlist.plitter.recommendations.application;
 
+import com.playlist.plitter.auth.domain.entity.UserEntity;
+import com.playlist.plitter.auth.domain.repository.UserRepository;
+import com.playlist.plitter.auth.exception.AuthErrorCode;
 import com.playlist.plitter.playlist.domain.entity.PlaylistEntity;
 import com.playlist.plitter.playlist.domain.repository.PlaylistRepository;
 import com.playlist.plitter.global.exception.ApiException;
@@ -24,10 +27,12 @@ public class RecommendationsService {
     private final PlaylistRepository playlistRepository;
     private final TrackRepository trackRepository;
     private final RecommendationsRepository recommendationsRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public RecommendationCreateResponse createRecommendation(
             Long playlistId,
+            Long recommenderUserId,
             RecommendationCreateRequest request
     ) {
         PlaylistEntity playlist = playlistRepository.findById(playlistId)
@@ -51,12 +56,21 @@ public class RecommendationsService {
 
         TrackEntity savedTrack = trackRepository.save(track);
 
+        UserEntity recommenderUser = null;
+        String guestToken = request.guestToken();
+
+        if (recommenderUserId != null) {
+            recommenderUser = userRepository.findById(recommenderUserId)
+                    .orElseThrow(() -> new ApiException(AuthErrorCode.USER_NOT_FOUND));
+            guestToken = null;
+        }
+
         RecommendationsEntity recommendation = RecommendationsEntity.builder()
                 .playlist(playlist)
                 .track(savedTrack)
-                .recommenderUser(null)
-                .guestToken(null)
-                .isAnonymous(false)
+                .recommenderUser(recommenderUser)
+                .guestToken(guestToken)
+                .isAnonymous(request.isAnonymous())
                 .comment(request.comment())
                 .build();
 

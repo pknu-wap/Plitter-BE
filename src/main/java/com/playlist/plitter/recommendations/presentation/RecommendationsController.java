@@ -7,6 +7,7 @@ import com.playlist.plitter.recommendations.application.dto.RecommendationCreate
 import com.playlist.plitter.recommendations.application.dto.RecommendationCreateResponse;
 import com.playlist.plitter.recommendations.application.dto.RecommendationDetailResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,9 +20,10 @@ public class RecommendationsController {
     @PostMapping("/{playlistId}/recommendations")
     public ResponseDto<RecommendationCreateResponse> createRecommendation(
             @PathVariable Long playlistId,
+            @AuthenticationPrincipal Long recommenderUserId,
             @RequestBody RecommendationCreateRequest request
     ) {
-        RecommendationCreateResponse response = recommendationsService.createRecommendation(playlistId, request);
+        RecommendationCreateResponse response = recommendationsService.createRecommendation(playlistId, recommenderUserId, request);
         return ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, response);
     }
 

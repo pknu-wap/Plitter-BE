@@ -6,8 +6,9 @@ public record RecommendationCreateRequest(
         String artistName,
         String albumCoverImageUrl,
         String previewUrl,
-        String comment
-
+        String comment,
+        String guestToken,
+        boolean isAnonymous
 ) {
 
 }
