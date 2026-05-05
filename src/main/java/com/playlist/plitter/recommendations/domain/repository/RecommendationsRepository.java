@@ -1,5 +1,6 @@
 package com.playlist.plitter.recommendations.domain.repository;
 
+import com.playlist.plitter.auth.domain.entity.UserEntity;
 import com.playlist.plitter.playlist.domain.entity.PlaylistEntity;
 import com.playlist.plitter.recommendations.domain.entity.RecommendationsEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,5 +21,15 @@ public interface RecommendationsRepository extends JpaRepository<Recommendations
             PlaylistEntity playlist,
             String spotifyTrackId,
             String comment
+    );
+
+    long countByPlaylistAndRecommenderUser(
+            PlaylistEntity playlist,
+            UserEntity recommenderUser
+    );
+
+    long countByPlaylistAndGuestToken(
+            PlaylistEntity playlist,
+            String guestToken
     );
 }

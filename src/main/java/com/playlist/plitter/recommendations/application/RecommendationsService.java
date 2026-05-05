@@ -24,6 +24,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RecommendationsService {
 
+    private static final int USER_RECOMMENDATION_LIMIT_PER_PLAYLIST = 3;
+    private static final int GUEST_RECOMMENDATION_LIMIT_PER_PLAYLIST = 1;
+
     private final PlaylistRepository playlistRepository;
     private final TrackRepository trackRepository;
     private final RecommendationsRepository recommendationsRepository;
@@ -37,6 +40,31 @@ public class RecommendationsService {
     ) {
         PlaylistEntity playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new RuntimeException("플레이리스트를 찾을 수 없습니다."));
+
+        UserEntity recommenderUser = null;
+        String guestToken = request.guestToken();
+
+        if (recommenderUserId != null) {
+            recommenderUser = userRepository.findById(recommenderUserId)
+                    .orElseThrow(() -> new ApiException(AuthErrorCode.USER_NOT_FOUND));
+
+            long recommendationCount = recommendationsRepository.countByPlaylistAndRecommenderUser(playlist, recommenderUser);
+            if (recommendationCount >= USER_RECOMMENDATION_LIMIT_PER_PLAYLIST) {
+                throw new ApiException(RecommendationsErrorCode.RECOMMENDATION_LIMIT_EXCEEDED);
+            }
+
+            guestToken = null;
+        } else {
+            if (guestToken == null || guestToken.isBlank()) {
+                throw new ApiException(RecommendationsErrorCode.GUEST_TOKEN_REQUIRED);
+            }
+
+            guestToken = guestToken.trim();
+            long recommendationCount = recommendationsRepository.countByPlaylistAndGuestToken(playlist, guestToken);
+            if (recommendationCount >= GUEST_RECOMMENDATION_LIMIT_PER_PLAYLIST) {
+                throw new ApiException(RecommendationsErrorCode.RECOMMENDATION_LIMIT_EXCEEDED);
+            }
+        }
 
         if (recommendationsRepository.existsByPlaylistAndTrack_SpotifyTrackIdAndComment(
                 playlist,
@@ -55,15 +83,6 @@ public class RecommendationsService {
                 .build();
 
         TrackEntity savedTrack = trackRepository.save(track);
-
-        UserEntity recommenderUser = null;
-        String guestToken = request.guestToken();
-
-        if (recommenderUserId != null) {
-            recommenderUser = userRepository.findById(recommenderUserId)
-                    .orElseThrow(() -> new ApiException(AuthErrorCode.USER_NOT_FOUND));
-            guestToken = null;
-        }
 
         RecommendationsEntity recommendation = RecommendationsEntity.builder()
                 .playlist(playlist)
