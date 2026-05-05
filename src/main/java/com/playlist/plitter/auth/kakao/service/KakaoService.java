@@ -1,8 +1,8 @@
 package com.playlist.plitter.auth.kakao.service;
 
+import com.playlist.plitter.auth.domain.entity.UserEntity;
 import com.playlist.plitter.auth.kakao.dto.KakaoTokenResponseDto;
 import com.playlist.plitter.auth.kakao.dto.KakaoUserInfoDto;
-import com.playlist.plitter.auth.kakao.entity.KakaoUserEntity;
 import com.playlist.plitter.auth.kakao.exception.KakaoErrorCode;
 import com.playlist.plitter.auth.kakao.repository.KakaoUserRepository;
 import com.playlist.plitter.global.exception.ApiException;
@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +24,9 @@ public class KakaoService {
 
     @Value("${kakao.client-id}")
     private String clientId;
+
+    @Value("${kakao.client-secret:}")
+    private String clientSecret;
 
     @Value("${kakao.redirect-uri}")
     private String redirectUri;
@@ -36,10 +41,12 @@ public class KakaoService {
     private String userInfoUrl;
 
     public String getKakaoLoginUrl() {
-        return authUrl
-                + "?response_type=code"
-                + "&client_id=" + clientId
-                + "&redirect_uri=" + redirectUri;
+        return UriComponentsBuilder.fromUriString(authUrl)
+                .queryParam("response_type", "code")
+                .queryParam("client_id", clientId)
+                .queryParam("redirect_uri", redirectUri)
+                .build()
+                .toUriString();
     }
 
     public KakaoTokenResponseDto getKakaoToken(String code) {
@@ -48,6 +55,9 @@ public class KakaoService {
         params.add("client_id", clientId);
         params.add("redirect_uri", redirectUri);
         params.add("code", code);
+        if (!clientSecret.isBlank()) {
+            params.add("client_secret", clientSecret);
+        }
 
         try {
             return RestClient.create()
@@ -57,6 +67,8 @@ public class KakaoService {
                     .body(params)
                     .retrieve()
                     .body(KakaoTokenResponseDto.class);
+        } catch (RestClientResponseException e) {
+            throw new ApiException(KakaoErrorCode.KAKAO_TOKEN_FAILED);
         } catch (Exception e) {
             throw new ApiException(KakaoErrorCode.KAKAO_TOKEN_FAILED);
         }
@@ -70,19 +82,22 @@ public class KakaoService {
                     .header("Authorization", "Bearer " + accessToken)
                     .retrieve()
                     .body(KakaoUserInfoDto.class);
+        } catch (RestClientResponseException e) {
+            throw new ApiException(KakaoErrorCode.KAKAO_USER_INFO_FAILED);
         } catch (Exception e) {
             throw new ApiException(KakaoErrorCode.KAKAO_USER_INFO_FAILED);
         }
     }
 
-    public KakaoUserEntity saveOrUpdateUser(KakaoUserInfoDto userInfo) {
+    public UserEntity saveOrUpdateUser(KakaoUserInfoDto userInfo) {
         return kakaoUserRepository.findByKakaoId(userInfo.getKakaoId())
                 .map(user -> {
                     user.updateNickname(userInfo.getNickname());
                     return kakaoUserRepository.save(user);
                 })
                 .orElseGet(() -> kakaoUserRepository.save(
-                        KakaoUserEntity.builder()
+                        UserEntity.builder()
+                                .role(UserEntity.Role.USER)
                                 .kakaoId(userInfo.getKakaoId())
                                 .nickname(userInfo.getNickname())
                                 .build()
