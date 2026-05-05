@@ -24,6 +24,9 @@ public class UserEntity {
     @Column(nullable = false)
     private Role role;
 
+    @Column(name = "nickname", length = 50)
+    private String nickname;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

@@ -43,6 +43,7 @@ public class RecommendationsService {
 
         UserEntity recommenderUser = null;
         String guestToken = request.guestToken();
+        String randomNickname = request.randomNickname();
 
         if (recommenderUserId != null) {
             recommenderUser = userRepository.findById(recommenderUserId)
@@ -54,12 +55,14 @@ public class RecommendationsService {
             }
 
             guestToken = null;
+            randomNickname = null;
         } else {
             if (guestToken == null || guestToken.isBlank()) {
                 throw new ApiException(RecommendationsErrorCode.GUEST_TOKEN_REQUIRED);
             }
 
             guestToken = guestToken.trim();
+            randomNickname = randomNickname == null ? null : randomNickname.trim();
             long recommendationCount = recommendationsRepository.countByPlaylistAndGuestToken(playlist, guestToken);
             if (recommendationCount >= GUEST_RECOMMENDATION_LIMIT_PER_PLAYLIST) {
                 throw new ApiException(RecommendationsErrorCode.RECOMMENDATION_LIMIT_EXCEEDED);
@@ -89,6 +92,7 @@ public class RecommendationsService {
                 .track(savedTrack)
                 .recommenderUser(recommenderUser)
                 .guestToken(guestToken)
+                .randomNickname(randomNickname)
                 .isAnonymous(request.isAnonymous())
                 .comment(request.comment())
                 .build();
@@ -107,12 +111,12 @@ public class RecommendationsService {
         RecommendationsEntity recommendation = recommendationsRepository.findById(recommendationId)
                 .orElseThrow(() -> new ApiException(RecommendationsErrorCode.RECOMMENDATION_NOT_FOUND));
 
-        List<String> comments = recommendationsRepository.findAllByPlaylistAndTrack_SpotifyTrackId(
+        List<RecommendationDetailResponse.CommentResponse> comments = recommendationsRepository.findAllByPlaylistAndTrack_SpotifyTrackId(
                         recommendation.getPlaylist(),
                         recommendation.getTrack().getSpotifyTrackId()
                 )
                 .stream()
-                .map(RecommendationsEntity::getComment)
+                .map(RecommendationDetailResponse.CommentResponse::from)
                 .toList();
 
         return RecommendationDetailResponse.from(recommendation, comments);

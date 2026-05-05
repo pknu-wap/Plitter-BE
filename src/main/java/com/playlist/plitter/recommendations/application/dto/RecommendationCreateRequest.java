@@ -8,6 +8,7 @@ public record RecommendationCreateRequest(
         String previewUrl,
         String comment,
         String guestToken,
+        String randomNickname,
         boolean isAnonymous
 ) {
 

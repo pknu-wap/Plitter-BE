@@ -3,7 +3,6 @@ package com.playlist.plitter.recommendations.application.dto;
 import com.playlist.plitter.recommendations.domain.entity.RecommendationsEntity;
 import com.playlist.plitter.track.domain.entity.TrackEntity;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public record RecommendationDetailResponse(
@@ -13,13 +12,11 @@ public record RecommendationDetailResponse(
         String artist,
         String albumCoverImageUrl,
         String previewUrl,
-        List<String> comments,
-        LocalDateTime createdAt
-        // writer 추가 예정
+        List<CommentResponse> comments
 ) {
     public static RecommendationDetailResponse from(
             RecommendationsEntity recommendation,
-            List<String> comments
+            List<CommentResponse> comments
     ) {
         TrackEntity track = recommendation.getTrack();
 
@@ -30,8 +27,20 @@ public record RecommendationDetailResponse(
                 track.getArtistName(),
                 track.getAlbumCoverUrl(),
                 track.getPreviewUrl(),
-                comments,
-                recommendation.getCreatedAt()
+                comments
         );
+    }
+
+    public record CommentResponse(
+            String recommenderName,
+            String comment
+    ) {
+        public static CommentResponse from(RecommendationsEntity recommendation) {
+            String recommenderName = recommendation.getRecommenderUser() != null
+                    ? recommendation.getRecommenderUser().getNickname()
+                    : recommendation.getRandomNickname();
+
+            return new CommentResponse(recommenderName, recommendation.getComment());
+        }
     }
 }
