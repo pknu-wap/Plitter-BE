@@ -24,6 +24,12 @@ public class UserEntity {
     @Column(nullable = false)
     private Role role;
 
+    @Column(name = "kakao_id", length = 100, unique = true)
+    private String kakaoId;
+
+    @Column(length = 50)
+    private String nickname;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -33,8 +39,14 @@ public class UserEntity {
     private LocalDateTime updatedAt;
 
     @Builder
-    public UserEntity(Role role) {
+    public UserEntity(Role role, String kakaoId, String nickname) {
         this.role = role;
+        this.kakaoId = kakaoId;
+        this.nickname = nickname;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public enum Role {
