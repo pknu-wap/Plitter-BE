@@ -18,6 +18,9 @@ public class KakaoUserInfoDto {
     }
 
     public String getNickname() {
+        if (kakaoAccount == null || kakaoAccount.getProfile() == null || kakaoAccount.getProfile().getNickname() == null) {
+            return "카카오사용자";
+        }
         return kakaoAccount.getProfile().getNickname();
     }
 

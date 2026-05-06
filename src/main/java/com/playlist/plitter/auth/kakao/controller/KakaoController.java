@@ -1,7 +1,7 @@
 package com.playlist.plitter.auth.kakao.controller;
 
 import com.playlist.plitter.auth.jwt.provider.JwtProvider;
-import com.playlist.plitter.auth.kakao.entity.KakaoUserEntity;
+import com.playlist.plitter.auth.domain.entity.UserEntity;
 import com.playlist.plitter.auth.kakao.service.KakaoService;
 import com.playlist.plitter.global.dto.ResponseDto;
 import com.playlist.plitter.global.dto.SuccessMessage;
@@ -42,7 +42,7 @@ public class KakaoController {
     @GetMapping("/callback")
     public ResponseEntity<Void> kakaoCallback(@RequestParam String code, HttpServletResponse response) {
         String kakaoAccessToken = kakaoService.getKakaoToken(code).getAccessToken();
-        KakaoUserEntity user = kakaoService.saveOrUpdateUser(kakaoService.getKakaoUserInfo(kakaoAccessToken));
+        UserEntity user = kakaoService.saveOrUpdateUser(kakaoService.getKakaoUserInfo(kakaoAccessToken));
 
         String accessToken = jwtProvider.createAccessToken(user.getId());
         String refreshToken = jwtProvider.createRefreshToken(user.getId());
