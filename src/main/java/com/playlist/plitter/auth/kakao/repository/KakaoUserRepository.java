@@ -1,13 +1,13 @@
 package com.playlist.plitter.auth.kakao.repository;
 
-import com.playlist.plitter.auth.kakao.entity.KakaoUserEntity;
+import com.playlist.plitter.auth.domain.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface KakaoUserRepository extends JpaRepository<KakaoUserEntity, Long> {
+public interface KakaoUserRepository extends JpaRepository<UserEntity, Long> {
 
-    Optional<KakaoUserEntity> findByKakaoId(String kakaoId);
+    Optional<UserEntity> findByKakaoId(String kakaoId);
 
     boolean existsByKakaoId(String kakaoId);
 
