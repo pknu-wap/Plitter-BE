@@ -23,6 +23,9 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+  
+    @Column(name = "kakao_id", length = 100, unique = true)
+    private String kakaoId;
 
     @Column(name = "nickname", length = 50)
     private String nickname;
@@ -36,8 +39,14 @@ public class UserEntity {
     private LocalDateTime updatedAt;
 
     @Builder
-    public UserEntity(Role role) {
+    public UserEntity(Role role, String kakaoId, String nickname) {
         this.role = role;
+        this.kakaoId = kakaoId;
+        this.nickname = nickname;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public enum Role {

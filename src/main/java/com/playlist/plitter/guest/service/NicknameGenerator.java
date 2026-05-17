@@ -1,4 +1,6 @@
-import com.playlist.plitter.auth.domain.repository.GuestUserRepository;
+package com.playlist.plitter.guest.service;
+
+import com.playlist.plitter.guest.repository.GuestUserRepository;
 
 import java.util.Random;
 
