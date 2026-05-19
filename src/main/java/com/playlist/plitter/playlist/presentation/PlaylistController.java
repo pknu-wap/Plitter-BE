@@ -30,9 +30,11 @@ public class PlaylistController {
     private final PlaylistService playlistService;
 
     @PostMapping("/playlists")
-    public ResponseDto<PlaylistCreateResponse> createPlaylist(
-            @AuthenticationPrincipal Long userId
-        ) {
+    public ResponseDto<PlaylistCreateResponse> createPlaylist() {
+        Long userId = (Long) org.springframework.security.core.context.SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
         PlaylistCreateResponse response = playlistService.savePlaylist(userId);
         return ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, response);
     }
