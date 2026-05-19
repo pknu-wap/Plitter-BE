@@ -38,7 +38,8 @@ public class PlaylistService {
     public PlaylistCreateResponse savePlaylist(Long userId) {
 
         System.out.println("* 유저 아이디: " + userId);
-        UserEntity user = userRepository.findById(userId)
+
+        UserEntity user = userRepository.findByKakaoId(String.valueOf(userId))
                 .orElseThrow(() -> new ApiException(AuthErrorCode.USER_NOT_FOUND));
 
         if (playlistRepository.existsByOwner(user)) {
