@@ -3,6 +3,15 @@ package com.playlist.plitter.character.application;
 import com.playlist.plitter.character.domain.entity.CharacterEntity;
 import com.playlist.plitter.character.domain.repository.CharacterRepository;
 import com.playlist.plitter.character.exception.CharacterErrorCode;
+import com.playlist.plitter.character.application.port.BaseCharacterClient;
+import com.playlist.plitter.character.application.port.CharacterAiClient;
+import com.playlist.plitter.character.application.port.CharacterImageEditClient;
+import com.playlist.plitter.character.application.port.ImageStorageClient;
+import com.playlist.plitter.character.application.port.MusicFeatureClient;
+import com.playlist.plitter.character.application.port.dto.CharacterEditSpec;
+import com.playlist.plitter.character.application.port.dto.CharacterEditSpecRequest;
+import com.playlist.plitter.character.application.port.dto.CharacterImageEditRequest;
+import com.playlist.plitter.character.application.port.dto.DownloadUrlResult;
 import com.playlist.plitter.character.presentation.dto.response.CharacterAvailabilityResponse;
 import com.playlist.plitter.character.presentation.dto.response.CharacterCreateResponse;
 import com.playlist.plitter.character.presentation.dto.response.CharacterDetailResponse;
@@ -12,9 +21,12 @@ import com.playlist.plitter.playlist.domain.entity.PlaylistEntity;
 import com.playlist.plitter.playlist.domain.repository.PlaylistRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
-import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +37,12 @@ public class CharacterService {
 
     private final CharacterRepository characterRepository;
     private final PlaylistRepository playlistRepository;
+    private final MusicFeatureClient musicFeatureClient;
+    private final CharacterAiClient characterAiClient;
+    private final BaseCharacterClient baseCharacterClient;
+    private final CharacterImageEditClient characterImageEditClient;
+    private final ImageStorageClient imageStorageClient;
+    private final PlatformTransactionManager transactionManager;
 
     public CharacterAvailabilityResponse getAvailability(Long playlistId) {
         PlaylistEntity playlist = getPlaylistOrThrow(playlistId);
@@ -32,35 +50,40 @@ public class CharacterService {
         int missingCount = Math.max(REQUIRED_RECOMMENDATION_COUNT - currentCount, 0);
 
         return new CharacterAvailabilityResponse(
-                missingCount == 0,
+                isCreatable(playlist),
                 REQUIRED_RECOMMENDATION_COUNT,
                 currentCount,
                 missingCount
         );
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public CharacterCreateResponse createCharacter(Long playlistId) {
         PlaylistEntity playlist = getPlaylistOrThrow(playlistId);
-        CharacterAvailabilityResponse availability = getAvailability(playlistId);
-
-        if (!availability.available()) {
+        if (!isCreatable(playlist)) {
             throw new ApiException(CharacterErrorCode.CHARACTER_NOT_AVAILABLE);
         }
 
-        int nextVersion = characterRepository.findTopByPlaylist_IdOrderByVersionDesc(playlistId)
-                .map(character -> character.getVersion() + 1)
-                .orElse(1);
-
-        String featureSummaryJson = buildFeatureSummaryJson(playlist);
-        String promptText = buildPromptText(featureSummaryJson);
-        String imageUrl = "https://cdn.plitter.local/characters/" + playlistId + "/v" + nextVersion + ".png";
-
-        CharacterEntity savedCharacter = characterRepository.save(
-                CharacterEntity.create(playlist, nextVersion, imageUrl, promptText, featureSummaryJson)
+        String featureSummaryJson = musicFeatureClient.collectFeatures(playlistId);
+        CharacterEditSpec editSpec = characterAiClient.createEditSpec(
+                new CharacterEditSpecRequest(playlistId, featureSummaryJson)
         );
-
-        return new CharacterCreateResponse(savedCharacter.getId(), savedCharacter.getImageUrl());
+        String editedCharacterImageUrl = characterImageEditClient.editCharacterImage(
+                new CharacterImageEditRequest(
+                        baseCharacterClient.getBaseCharacter(),
+                        editSpec
+                )
+        );
+        String storedCharacterImageUrl = imageStorageClient.storeCharacterImage(
+                playlistId,
+                editedCharacterImageUrl
+        );
+        return saveCharacterWithTransaction(
+                playlistId,
+                storedCharacterImageUrl,
+                editSpec.promptText(),
+                featureSummaryJson
+        );
     }
 
     public CharacterDetailResponse getCharacter(Long playlistId) {
@@ -70,11 +93,11 @@ public class CharacterService {
 
     public CharacterDownloadUrlResponse getCharacterDownloadUrl(Long playlistId) {
         CharacterEntity character = getLatestCharacterOrThrow(playlistId);
-        String imageUrl = character.getImageUrl();
+        DownloadUrlResult downloadUrlResult = imageStorageClient.createDownloadUrl(character.getImageUrl());
         return new CharacterDownloadUrlResponse(
-                imageUrl + "?download=true",
-                imageUrl,
-                LocalDateTime.now().plusMinutes(30)
+                downloadUrlResult.downloadUrl(),
+                character.getImageUrl(),
+                downloadUrlResult.expiresAt()
         );
     }
 
@@ -89,15 +112,34 @@ public class CharacterService {
                 .orElseThrow(() -> new ApiException(CharacterErrorCode.CHARACTER_NOT_FOUND));
     }
 
-    private String buildFeatureSummaryJson(PlaylistEntity playlist) {
-        return String.format(
-                "{\"playlistId\":%d,\"recommendationCount\":%d}",
-                playlist.getId(),
-                playlist.getRecommendationCount()
-        );
+    private boolean isCreatable(PlaylistEntity playlist) {
+        return playlist.getRecommendationCount() >= REQUIRED_RECOMMENDATION_COUNT;
     }
 
-    private String buildPromptText(String featureSummaryJson) {
-        return "Analyze music taste from summary: " + featureSummaryJson;
+    private CharacterCreateResponse saveCharacterWithTransaction(
+            Long playlistId,
+            String storedCharacterImageUrl,
+            String promptText,
+            String featureSummaryJson
+    ) {
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+        CharacterCreateResponse response = transactionTemplate.execute(status -> {
+            PlaylistEntity managedPlaylist = getPlaylistOrThrow(playlistId);
+            int nextVersion = characterRepository.findTopByPlaylist_IdOrderByVersionDesc(playlistId)
+                    .map(character -> character.getVersion() + 1)
+                    .orElse(1);
+
+            CharacterEntity savedCharacter = characterRepository.save(
+                    CharacterEntity.create(
+                            managedPlaylist,
+                            nextVersion,
+                            storedCharacterImageUrl,
+                            promptText,
+                            featureSummaryJson
+                    )
+            );
+            return new CharacterCreateResponse(savedCharacter.getId(), savedCharacter.getImageUrl());
+        });
+        return Objects.requireNonNull(response);
     }
 }
