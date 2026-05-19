@@ -37,6 +37,7 @@ public class PlaylistService {
 
     public PlaylistCreateResponse savePlaylist(Long userId) {
 
+        System.out.println("* 유저 아이디: " + userId);
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApiException(AuthErrorCode.USER_NOT_FOUND));
 
