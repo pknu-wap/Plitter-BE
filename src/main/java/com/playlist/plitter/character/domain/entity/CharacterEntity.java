@@ -14,7 +14,15 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "characters")
+@Table(
+        name = "characters",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_character_playlist_version",
+                        columnNames = {"playlist_id", "version"}
+                )
+        }
+)
 public class CharacterEntity {
 
     @Id

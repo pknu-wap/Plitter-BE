@@ -6,7 +6,8 @@ import org.springframework.http.HttpStatus;
 public enum CharacterErrorCode implements ErrorCode {
     PLAYLIST_NOT_FOUND(HttpStatus.NOT_FOUND, "PLAYLIST_NOT_FOUND", "플레이리스트를 찾을 수 없습니다."),
     CHARACTER_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "CHARACTER_NOT_AVAILABLE", "캐릭터 생성 조건을 만족하지 않습니다."),
-    CHARACTER_NOT_FOUND(HttpStatus.NOT_FOUND, "CHARACTER_NOT_FOUND", "생성된 캐릭터를 찾을 수 없습니다.");
+    CHARACTER_NOT_FOUND(HttpStatus.NOT_FOUND, "CHARACTER_NOT_FOUND", "생성된 캐릭터를 찾을 수 없습니다."),
+    CHARACTER_GENERATION_FAILED(HttpStatus.BAD_GATEWAY, "CHARACTER_GENERATION_FAILED", "캐릭터 생성 중 외부 연동에 실패했습니다.");
 
     private final HttpStatus httpStatus;
     private final String errorCode;
