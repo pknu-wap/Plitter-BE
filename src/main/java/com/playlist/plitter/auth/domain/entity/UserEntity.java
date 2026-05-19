@@ -23,11 +23,11 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
-
+  
     @Column(name = "kakao_id", length = 100, unique = true)
     private String kakaoId;
 
-    @Column(length = 50)
+    @Column(name = "nickname", length = 50)
     private String nickname;
 
     @CreationTimestamp
