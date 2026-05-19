@@ -34,4 +34,20 @@ public record RecommendationDetailResponse(
                 recommendation.getCreatedAt()
         );
     }
+                comments
+        );
+    }
+
+    public record CommentResponse(
+            String recommenderName,
+            String comment
+    ) {
+        public static CommentResponse from(RecommendationsEntity recommendation) {
+            String recommenderName = recommendation.getRecommenderUser() != null
+                    ? recommendation.getRecommenderUser().getNickname()
+                    : recommendation.getRandomNickname();
+
+            return new CommentResponse(recommenderName, recommendation.getComment());
+        }
+    }
 }

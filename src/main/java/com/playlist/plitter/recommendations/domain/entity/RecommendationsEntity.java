@@ -40,6 +40,9 @@ public class RecommendationsEntity {
     @Column(name = "guest_token", length = 100)
     private String guestToken;
 
+    @Column(name = "random_nickname", length = 50)
+    private String randomNickname;
+
     @Column(name = "is_anonymous", nullable = false)
     private boolean isAnonymous;
 
@@ -60,6 +63,7 @@ public class RecommendationsEntity {
             TrackEntity track,
             UserEntity recommenderUser,
             String guestToken,
+            String randomNickname,
             boolean isAnonymous,
             String comment
     ) {
@@ -67,6 +71,7 @@ public class RecommendationsEntity {
         this.track = track;
         this.recommenderUser = recommenderUser;
         this.guestToken = guestToken;
+        this.randomNickname = randomNickname;
         this.isAnonymous = isAnonymous;
         this.comment = comment;
     }
