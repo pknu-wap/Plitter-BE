@@ -7,20 +7,12 @@ import com.playlist.plitter.playlist.application.dto.PlaylistCheckResponse;
 import com.playlist.plitter.playlist.application.dto.PlaylistCreateResponse;
 import com.playlist.plitter.playlist.application.dto.PlaylistResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-import com.playlist.plitter.playlist.domain.entity.PlaylistEntity;
-import com.playlist.plitter.playlist.domain.repository.PlaylistRepository;
-import com.playlist.plitter.playlist.exception.PlaylistErrorCode;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api")
@@ -30,11 +22,9 @@ public class PlaylistController {
     private final PlaylistService playlistService;
 
     @PostMapping("/playlists")
-    public ResponseDto<PlaylistCreateResponse> createPlaylist() {
-        Long userId = (Long) org.springframework.security.core.context.SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
+    public ResponseDto<PlaylistCreateResponse> createPlaylist(
+            @AuthenticationPrincipal Long userId
+    ) {
         PlaylistCreateResponse response = playlistService.savePlaylist(userId);
         return ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, response);
     }
@@ -42,7 +32,7 @@ public class PlaylistController {
     @GetMapping("/playlists/check")
     public ResponseDto<PlaylistCheckResponse> checkPlaylist(
             @AuthenticationPrincipal Long userId
-        ) {
+    ) {
         PlaylistCheckResponse response = playlistService.checkPlaylist(userId);
         return ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, response);
     }
