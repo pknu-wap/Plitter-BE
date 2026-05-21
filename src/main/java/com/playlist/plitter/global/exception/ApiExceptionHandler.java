@@ -19,6 +19,8 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseDto<Void>> handleGeneralException(Exception ex) {
+        ex.printStackTrace();
+
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ResponseDto.ofFailure("INTERNAL_SERVER_ERROR", "An unexpected error occurred"));
