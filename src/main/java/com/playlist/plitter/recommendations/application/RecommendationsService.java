@@ -120,23 +120,27 @@ public class RecommendationsService {
     }
 
     private void saveTrackFeatureIfAbsent(TrackEntity track) {
-        if (trackFeatureRepository.existsByTrack(track)) {
-            return;
+        try {
+            if (trackFeatureRepository.existsByTrack(track)) {
+                return;
+            }
+
+            SpotifyTrackFeatureResponse feature = spotifyTrackClient.getTrackFeature(track.getSpotifyTrackId());
+            TrackFeatureEntity trackFeature = TrackFeatureEntity.builder()
+                    .track(track)
+                    .bpm(feature.bpm())
+                    .mood(null)
+                    .genre(feature.genre())
+                    .energy(feature.energy())
+                    .valence(feature.valence())
+                    .rawFeatureJson(feature.rawFeatureJson())
+                    .fetchedAt(LocalDateTime.now())
+                    .build();
+
+            trackFeatureRepository.save(trackFeature);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        SpotifyTrackFeatureResponse feature = spotifyTrackClient.getTrackFeature(track.getSpotifyTrackId());
-        TrackFeatureEntity trackFeature = TrackFeatureEntity.builder()
-                .track(track)
-                .bpm(feature.bpm())
-                .mood(null)
-                .genre(feature.genre())
-                .energy(feature.energy())
-                .valence(feature.valence())
-                .rawFeatureJson(feature.rawFeatureJson())
-                .fetchedAt(LocalDateTime.now())
-                .build();
-
-        trackFeatureRepository.save(trackFeature);
     }
 
     @Transactional(readOnly = true)
