@@ -83,19 +83,18 @@ public class RecommendationsService {
             throw new ApiException(RecommendationsErrorCode.DUPLICATE_RECOMMENDATION);
         }
 
-        TrackEntity track = TrackEntity.builder()
-                .spotifyTrackId(request.spotifyId())
-                .title(request.title())
-                .artistName(request.artistName())
-                .albumCoverUrl(request.albumCoverImageUrl())
-                .previewUrl(request.previewUrl())
-                .build();
-
-        TrackEntity savedTrack = trackRepository.save(track);
+        TrackEntity track = trackRepository.findBySpotifyTrackId(request.spotifyId())
+                .orElseGet(() -> trackRepository.save(TrackEntity.builder()
+                        .spotifyTrackId(request.spotifyId())
+                        .title(request.title())
+                        .artistName(request.artistName())
+                        .albumCoverUrl(request.albumCoverImageUrl())
+                        .previewUrl(request.previewUrl())
+                        .build()));
 
         RecommendationsEntity recommendation = RecommendationsEntity.builder()
                 .playlist(playlist)
-                .track(savedTrack)
+                .track(track)
                 .recommenderUser(recommenderUser)
                 .guestToken(guestToken)
                 .randomNickname(randomNickname)
