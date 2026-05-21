@@ -19,7 +19,6 @@ import com.playlist.plitter.track.domain.entity.TrackFeatureEntity;
 import com.playlist.plitter.track.domain.repository.TrackFeatureRepository;
 import com.playlist.plitter.track.domain.repository.TrackRepository;
 import com.playlist.plitter.track.infrastructure.spotify.SpotifyTrackClient;
-import com.playlist.plitter.track.infrastructure.spotify.SpotifyTrackFeatureResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -125,15 +124,15 @@ public class RecommendationsService {
                 return;
             }
 
-            SpotifyTrackFeatureResponse feature = spotifyTrackClient.getTrackFeature(track.getSpotifyTrackId());
+            String genre = spotifyTrackClient.getTrackGenre(track.getSpotifyTrackId());
             TrackFeatureEntity trackFeature = TrackFeatureEntity.builder()
                     .track(track)
-                    .bpm(feature.bpm())
+                    .bpm(null)
                     .mood(null)
-                    .genre(feature.genre())
-                    .energy(feature.energy())
-                    .valence(feature.valence())
-                    .rawFeatureJson(feature.rawFeatureJson())
+                    .genre(genre)
+                    .energy(null)
+                    .valence(null)
+                    .rawFeatureJson("{\"genre\":\"" + escapeJson(genre) + "\"}")
                     .fetchedAt(LocalDateTime.now())
                     .build();
 
@@ -141,6 +140,10 @@ public class RecommendationsService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private String escapeJson(String value) {
+        return value == null ? "" : value.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 
     @Transactional(readOnly = true)

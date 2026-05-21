@@ -1,7 +1,5 @@
 package com.playlist.plitter.track.infrastructure.spotify;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.playlist.plitter.global.exception.ApiException;
 import com.playlist.plitter.track.application.dto.TrackSearchResponse;
 import com.playlist.plitter.track.exception.TrackErrorCode;
@@ -14,24 +12,18 @@ import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
 import se.michaelthelin.spotify.model_objects.special.SearchResult;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
-import se.michaelthelin.spotify.model_objects.specification.AudioFeatures;
 import se.michaelthelin.spotify.model_objects.specification.Image;
 import se.michaelthelin.spotify.model_objects.specification.Track;
 import se.michaelthelin.spotify.exceptions.detailed.UnauthorizedException;
 import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 import se.michaelthelin.spotify.requests.data.search.SearchItemRequest;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 public class SpotifyTrackClient {
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${spotify.client-id}")
     private String clientId;
@@ -83,25 +75,15 @@ public class SpotifyTrackClient {
         }
     }
 
-    public SpotifyTrackFeatureResponse getTrackFeature(String spotifyTrackId) {
+    public String getTrackGenre(String spotifyTrackId) {
         try {
             SpotifyApi spotifyApi = createSpotifyApi();
 
-            AudioFeatures audioFeatures = spotifyApi.getAudioFeaturesForTrack(spotifyTrackId)
-                    .build()
-                    .execute();
             Track track = spotifyApi.getTrack(spotifyTrackId)
                     .build()
                     .execute();
-            String genre = getGenre(spotifyApi, track);
 
-            return new SpotifyTrackFeatureResponse(
-                    toBigDecimal(audioFeatures.getTempo()),
-                    genre,
-                    toBigDecimal(audioFeatures.getEnergy()),
-                    toBigDecimal(audioFeatures.getValence()),
-                    toRawFeatureJson(audioFeatures, genre)
-            );
+            return getGenre(spotifyApi, track);
         } catch (UnauthorizedException e) {
             throw new ApiException(TrackErrorCode.SPOTIFY_UNAUTHORIZED);
         } catch (Exception e) {
@@ -138,30 +120,5 @@ public class SpotifyTrackClient {
 
         String genre = String.join(", ", genres);
         return genre.length() > 100 ? genre.substring(0, 100) : genre;
-    }
-
-    private BigDecimal toBigDecimal(Float value) {
-        return value == null ? BigDecimal.ZERO : BigDecimal.valueOf(value.doubleValue());
-    }
-
-    private String toRawFeatureJson(AudioFeatures audioFeatures, String genre) throws JsonProcessingException {
-        Map<String, Object> rawFeature = new LinkedHashMap<>();
-        rawFeature.put("id", audioFeatures.getId());
-        rawFeature.put("tempo", audioFeatures.getTempo());
-        rawFeature.put("energy", audioFeatures.getEnergy());
-        rawFeature.put("valence", audioFeatures.getValence());
-        rawFeature.put("danceability", audioFeatures.getDanceability());
-        rawFeature.put("acousticness", audioFeatures.getAcousticness());
-        rawFeature.put("instrumentalness", audioFeatures.getInstrumentalness());
-        rawFeature.put("liveness", audioFeatures.getLiveness());
-        rawFeature.put("loudness", audioFeatures.getLoudness());
-        rawFeature.put("speechiness", audioFeatures.getSpeechiness());
-        rawFeature.put("key", audioFeatures.getKey());
-        rawFeature.put("mode", audioFeatures.getMode());
-        rawFeature.put("timeSignature", audioFeatures.getTimeSignature());
-        rawFeature.put("durationMs", audioFeatures.getDurationMs());
-        rawFeature.put("genre", genre);
-
-        return objectMapper.writeValueAsString(rawFeature);
     }
 }
