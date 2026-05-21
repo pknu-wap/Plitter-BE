@@ -31,13 +31,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SpotifyTrackClient {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Value("${spotify.client-id}")
     private String clientId;
 
     @Value("${spotify.client-secret}")
     private String clientSecret;
-
-    private final ObjectMapper objectMapper;
 
     public List<TrackSearchResponse> searchTracks(String keyword, Integer limit) {
         try {
