@@ -13,13 +13,13 @@ public record RecommendationDetailResponse(
         String artist,
         String albumCoverImageUrl,
         String previewUrl,
-        List<String> comments,
+        List<CommentResponse> comments,
         LocalDateTime createdAt
         // writer 추가 예정
 ) {
     public static RecommendationDetailResponse from(
             RecommendationsEntity recommendation,
-            List<String> comments
+            List<CommentResponse> comments
     ) {
         TrackEntity track = recommendation.getTrack();
 
@@ -32,9 +32,6 @@ public record RecommendationDetailResponse(
                 track.getPreviewUrl(),
                 comments,
                 recommendation.getCreatedAt()
-        );
-    }
-                comments
         );
     }
 

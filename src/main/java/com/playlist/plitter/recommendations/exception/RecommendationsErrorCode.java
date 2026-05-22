@@ -7,7 +7,8 @@ public enum RecommendationsErrorCode implements ErrorCode {
     RECOMMENDATION_NOT_FOUND(HttpStatus.NOT_FOUND, "추천된 곡을 찾을 수 없습니다.", "RECOMMENDATION_NOT_FOUND"),
     DUPLICATE_RECOMMENDATION(HttpStatus.CONFLICT, "동일한 추천이 존재합니다.", "DUPLICATE_RECOMMENDATION"),
     RECOMMENDATION_LIMIT_EXCEEDED(HttpStatus.CONFLICT, "추천 허용 개수를 초과했습니다.", "RECOMMENDATION_LIMIT_EXCEEDED"),
-    GUEST_TOKEN_REQUIRED(HttpStatus.BAD_REQUEST, "게스트 토큰이 필요합니다.", "GUEST_TOKEN_REQUIRED");
+    GUEST_TOKEN_REQUIRED(HttpStatus.BAD_REQUEST, "게스트 토큰이 필요합니다.", "GUEST_TOKEN_REQUIRED"),
+    GUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "게스트를 찾을 수 없습니다.", "GUEST_NOT_FOUND");
 
     private final HttpStatus httpStatus;
     private final String message;
