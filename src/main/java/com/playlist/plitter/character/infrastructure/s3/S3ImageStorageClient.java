@@ -12,7 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -49,6 +52,8 @@ public class S3ImageStorageClient implements ImageStorageClient, DisposableBean 
 
     public S3ImageStorageClient(
             @Value("${aws.region:${AWS_REGION:ap-northeast-2}}") String awsRegion,
+            @Value("${aws.access-key-id:${AWS_ACCESS_KEY_ID:}}") String accessKeyId,
+            @Value("${aws.secret-access-key:${AWS_SECRET_ACCESS_KEY:}}") String secretAccessKey,
             @Value("${character.storage.s3.bucket}") String bucket,
             @Value("${character.storage.s3.key-prefix:characters}") String keyPrefix,
             @Value("${character.storage.s3.public-base-url:}") String publicBaseUrl,
@@ -60,7 +65,7 @@ public class S3ImageStorageClient implements ImageStorageClient, DisposableBean 
         this.downloadExpiryMinutes = downloadExpiryMinutes > 0 ? downloadExpiryMinutes : 30;
 
         Region region = Region.of(awsRegion);
-        DefaultCredentialsProvider credentialsProvider = DefaultCredentialsProvider.create();
+        AwsCredentialsProvider credentialsProvider = resolveCredentialsProvider(accessKeyId, secretAccessKey);
         this.s3Client = S3Client.builder()
                 .region(region)
                 .credentialsProvider(credentialsProvider)
@@ -229,6 +234,15 @@ public class S3ImageStorageClient implements ImageStorageClient, DisposableBean 
         }
         String trimmed = value.trim();
         return trimmed.endsWith("/") ? trimmed.substring(0, trimmed.length() - 1) : trimmed;
+    }
+
+    private AwsCredentialsProvider resolveCredentialsProvider(String accessKeyId, String secretAccessKey) {
+        if (StringUtils.hasText(accessKeyId) && StringUtils.hasText(secretAccessKey)) {
+            return StaticCredentialsProvider.create(
+                    AwsBasicCredentials.create(accessKeyId.trim(), secretAccessKey.trim())
+            );
+        }
+        return DefaultCredentialsProvider.create();
     }
 
     private record StoredImageInput(
