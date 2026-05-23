@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
@@ -38,6 +40,7 @@ import java.util.regex.Pattern;
 @Component
 public class S3ImageStorageClient implements ImageStorageClient, DisposableBean {
 
+    private static final Logger log = LoggerFactory.getLogger(S3ImageStorageClient.class);
     private static final Pattern DATA_URI_PATTERN =
             Pattern.compile("^data:(image/[a-zA-Z0-9.+-]+);base64,(.+)$", Pattern.DOTALL);
     private static final String DEFAULT_CONTENT_TYPE = MediaType.IMAGE_PNG_VALUE;
@@ -94,6 +97,7 @@ public class S3ImageStorageClient implements ImageStorageClient, DisposableBean 
         } catch (ApiException e) {
             throw e;
         } catch (Exception e) {
+            log.error("S3 image upload failed: playlistId={}, source={}", playlistId, sourceImageUrl, e);
             throw new ApiException(CharacterErrorCode.CHARACTER_GENERATION_FAILED);
         }
     }
@@ -119,6 +123,7 @@ public class S3ImageStorageClient implements ImageStorageClient, DisposableBean 
         } catch (ApiException e) {
             throw e;
         } catch (Exception e) {
+            log.error("S3 download URL creation failed: imageUrl={}", imageUrl, e);
             throw new ApiException(CharacterErrorCode.CHARACTER_GENERATION_FAILED);
         }
     }

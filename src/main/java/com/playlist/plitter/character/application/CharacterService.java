@@ -98,12 +98,6 @@ public class CharacterService {
                 .orElseThrow(() -> new ApiException(CharacterErrorCode.PLAYLIST_NOT_FOUND));
     }
 
-    private CharacterEntity getLatestCharacterOrThrow(Long playlistId) {
-        getPlaylistOrThrow(playlistId);
-        return characterRepository.findTopByPlaylist_IdOrderByVersionDesc(playlistId)
-                .orElseThrow(() -> new ApiException(CharacterErrorCode.CHARACTER_NOT_FOUND));
-    }
-
     private CharacterEntity getLatestCreatedCharacterOrThrow(Long playlistId) {
         getPlaylistOrThrow(playlistId);
         return characterRepository.findTopByPlaylist_IdOrderByCreatedAtDescIdDesc(playlistId)
