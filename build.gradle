@@ -26,6 +26,7 @@ repositories {
 }
 
 dependencies {
+    implementation platform('software.amazon.awssdk:bom:2.31.67')
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-client'
@@ -48,6 +49,8 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'se.michaelthelin.spotify:spotify-web-api-java:9.4.0'
+    implementation 'software.amazon.awssdk:s3'
+    implementation 'software.amazon.awssdk:url-connection-client'
 }
 
 tasks.named('test') {

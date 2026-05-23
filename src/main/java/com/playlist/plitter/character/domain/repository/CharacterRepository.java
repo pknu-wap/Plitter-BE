@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface CharacterRepository extends JpaRepository<CharacterEntity, Long> {
     Optional<CharacterEntity> findTopByPlaylist_IdOrderByVersionDesc(Long playlistId);
+    Optional<CharacterEntity> findTopByPlaylist_IdOrderByCreatedAtDescIdDesc(Long playlistId);
 }

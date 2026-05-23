@@ -79,12 +79,12 @@ public class CharacterService {
     }
 
     public CharacterDetailResponse getCharacter(Long playlistId) {
-        CharacterEntity character = getLatestCharacterOrThrow(playlistId);
+        CharacterEntity character = getLatestCreatedCharacterOrThrow(playlistId);
         return new CharacterDetailResponse(character.getId(), character.getImageUrl());
     }
 
     public CharacterDownloadUrlResponse getCharacterDownloadUrl(Long playlistId) {
-        CharacterEntity character = getLatestCharacterOrThrow(playlistId);
+        CharacterEntity character = getLatestCreatedCharacterOrThrow(playlistId);
         DownloadUrlResult downloadUrlResult = imageStorageClient.createDownloadUrl(character.getImageUrl());
         return new CharacterDownloadUrlResponse(
                 downloadUrlResult.downloadUrl(),
@@ -98,9 +98,9 @@ public class CharacterService {
                 .orElseThrow(() -> new ApiException(CharacterErrorCode.PLAYLIST_NOT_FOUND));
     }
 
-    private CharacterEntity getLatestCharacterOrThrow(Long playlistId) {
+    private CharacterEntity getLatestCreatedCharacterOrThrow(Long playlistId) {
         getPlaylistOrThrow(playlistId);
-        return characterRepository.findTopByPlaylist_IdOrderByVersionDesc(playlistId)
+        return characterRepository.findTopByPlaylist_IdOrderByCreatedAtDescIdDesc(playlistId)
                 .orElseThrow(() -> new ApiException(CharacterErrorCode.CHARACTER_NOT_FOUND));
     }
 
