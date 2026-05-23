@@ -12,6 +12,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -65,21 +66,25 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
         if (!StringUtils.hasText(openAiApiKey)) {
             throw new ApiException(CharacterErrorCode.CHARACTER_GENERATION_FAILED);
         }
+        if (!StringUtils.hasText(request.baseCharacterImage().imageUrl())) {
+            throw new ApiException(CharacterErrorCode.CHARACTER_GENERATION_FAILED);
+        }
 
         try {
-            byte[] imageBytes = sourceImageRestClient.get()
+            ResponseEntity<byte[]> sourceImageResponse = sourceImageRestClient.get()
                     .uri(URI.create(request.baseCharacterImage().imageUrl()))
                     .retrieve()
-                    .body(byte[].class);
+                    .toEntity(byte[].class);
+            byte[] imageBytes = sourceImageResponse.getBody();
 
             if (imageBytes == null || imageBytes.length == 0) {
                 throw new ApiException(CharacterErrorCode.CHARACTER_GENERATION_FAILED);
             }
 
             HttpHeaders imageHeaders = new HttpHeaders();
-            imageHeaders.setContentType(MediaType.parseMediaType(DEFAULT_IMAGE_MEDIA_TYPE));
+            imageHeaders.setContentType(resolveImageMediaType(sourceImageResponse.getHeaders().getContentType()));
             HttpEntity<ByteArrayResource> imagePart = new HttpEntity<>(
-                    new NamedByteArrayResource(imageBytes, "base-character.png"),
+                    new NamedByteArrayResource(imageBytes, resolveFilename(sourceImageResponse.getHeaders(), request.baseCharacterImage().imageUrl())),
                     imageHeaders
             );
 
@@ -128,6 +133,27 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
         requestFactory.setConnectTimeout(Duration.ofMillis(safeTimeout));
         requestFactory.setReadTimeout(Duration.ofMillis(safeTimeout));
         return requestFactory;
+    }
+
+    private MediaType resolveImageMediaType(MediaType sourceMediaType) {
+        if (sourceMediaType == null || !sourceMediaType.getType().equals("image")) {
+            return MediaType.parseMediaType(DEFAULT_IMAGE_MEDIA_TYPE);
+        }
+        return sourceMediaType;
+    }
+
+    private String resolveFilename(HttpHeaders headers, String sourceImageUrl) {
+        String headerFilename = headers.getContentDisposition().getFilename();
+        if (StringUtils.hasText(headerFilename)) {
+            return headerFilename;
+        }
+
+        String sanitized = sourceImageUrl.split("\\?")[0];
+        int slashIndex = sanitized.lastIndexOf('/');
+        if (slashIndex >= 0 && slashIndex + 1 < sanitized.length()) {
+            return sanitized.substring(slashIndex + 1);
+        }
+        return "base-character.png";
     }
 
     private static class NamedByteArrayResource extends ByteArrayResource {
