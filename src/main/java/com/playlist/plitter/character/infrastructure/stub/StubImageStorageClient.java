@@ -2,10 +2,12 @@ package com.playlist.plitter.character.infrastructure.stub;
 
 import com.playlist.plitter.character.application.port.ImageStorageClient;
 import com.playlist.plitter.character.application.port.dto.DownloadUrlResult;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+@Profile("character-stub")
 @Component
 public class StubImageStorageClient implements ImageStorageClient {
 
