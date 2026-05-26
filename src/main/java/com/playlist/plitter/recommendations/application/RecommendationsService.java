@@ -110,6 +110,7 @@ public class RecommendationsService {
                 .build();
 
         RecommendationsEntity savedRecommendation = recommendationsRepository.save(recommendation);
+        playlistRepository.increaseRecommendationCount(playlist);
 
         return new RecommendationCreateResponse(
                 savedRecommendation.getId(),
