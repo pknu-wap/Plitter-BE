@@ -3,6 +3,8 @@ package com.playlist.plitter.track.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -42,7 +44,14 @@ public class TrackFeatureEntity {
     @Column(name = "valence", precision = 5, scale = 2)
     private BigDecimal valence;
 
+    @Column(name = "feature_source", length = 50)
+    private String featureSource;
+
+    @Column(name = "confidence", precision = 4, scale = 2)
+    private BigDecimal confidence;
+
     @Column(name = "raw_feature_json", columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     private String rawFeatureJson;
 
     @Column(name = "fetched_at")
@@ -64,6 +73,8 @@ public class TrackFeatureEntity {
             String genre,
             BigDecimal energy,
             BigDecimal valence,
+            String featureSource,
+            BigDecimal confidence,
             String rawFeatureJson,
             LocalDateTime fetchedAt
     ) {
@@ -73,6 +84,30 @@ public class TrackFeatureEntity {
         this.genre = genre;
         this.energy = energy;
         this.valence = valence;
+        this.featureSource = featureSource;
+        this.confidence = confidence;
+        this.rawFeatureJson = rawFeatureJson;
+        this.fetchedAt = fetchedAt;
+    }
+
+    public void updateMetadataFeatures(
+            BigDecimal bpm,
+            String mood,
+            String genre,
+            BigDecimal energy,
+            BigDecimal valence,
+            String featureSource,
+            BigDecimal confidence,
+            String rawFeatureJson,
+            LocalDateTime fetchedAt
+    ) {
+        this.bpm = bpm;
+        this.mood = mood;
+        this.genre = genre;
+        this.energy = energy;
+        this.valence = valence;
+        this.featureSource = featureSource;
+        this.confidence = confidence;
         this.rawFeatureJson = rawFeatureJson;
         this.fetchedAt = fetchedAt;
     }

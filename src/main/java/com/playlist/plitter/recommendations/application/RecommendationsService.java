@@ -14,9 +14,11 @@ import com.playlist.plitter.recommendations.application.dto.RecommendationDetail
 import com.playlist.plitter.recommendations.domain.entity.RecommendationsEntity;
 import com.playlist.plitter.recommendations.domain.repository.RecommendationsRepository;
 import com.playlist.plitter.recommendations.exception.RecommendationsErrorCode;
+import com.playlist.plitter.track.application.feature.TrackFeatureEnrichmentRequestedEvent;
 import com.playlist.plitter.track.domain.entity.TrackEntity;
 import com.playlist.plitter.track.domain.repository.TrackRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,7 @@ public class RecommendationsService {
     private final RecommendationsRepository recommendationsRepository;
     private final UserRepository userRepository;
     private final GuestUserRepository guestUserRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     public RecommendationCreateResponse createRecommendation(
@@ -104,6 +107,7 @@ public class RecommendationsService {
                 .build();
 
         RecommendationsEntity savedRecommendation = recommendationsRepository.save(recommendation);
+        applicationEventPublisher.publishEvent(new TrackFeatureEnrichmentRequestedEvent(savedTrack.getId()));
 
         return new RecommendationCreateResponse(
                 savedRecommendation.getId(),
