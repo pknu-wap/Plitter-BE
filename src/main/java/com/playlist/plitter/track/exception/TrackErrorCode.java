@@ -7,8 +7,7 @@ public enum TrackErrorCode implements ErrorCode {
 
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "검색어는 필수입니다.", "INVALID_REQUEST"),
     SPOTIFY_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Spotify 인증에 실패했습니다.", "SPOTIFY_UNAUTHORIZED"),
-    TRACK_SEARCH_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "노래 검색 중 오류가 발생했습니다.", "INTERNAL_SERVER_ERROR"),
-    TRACK_FEATURE_FETCH_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "트랙 특성 정보를 가져오는 중 오류가 발생했습니다.", "TRACK_FEATURE_FETCH_FAILED");
+    TRACK_SEARCH_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "노래 검색 중 오류가 발생했습니다.", "INTERNAL_SERVER_ERROR");
 
     private final HttpStatus httpStatus;
     private final String message;

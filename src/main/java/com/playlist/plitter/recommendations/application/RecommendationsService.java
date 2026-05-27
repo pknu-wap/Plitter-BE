@@ -15,15 +15,11 @@ import com.playlist.plitter.recommendations.domain.entity.RecommendationsEntity;
 import com.playlist.plitter.recommendations.domain.repository.RecommendationsRepository;
 import com.playlist.plitter.recommendations.exception.RecommendationsErrorCode;
 import com.playlist.plitter.track.domain.entity.TrackEntity;
-import com.playlist.plitter.track.domain.entity.TrackFeatureEntity;
-import com.playlist.plitter.track.domain.repository.TrackFeatureRepository;
 import com.playlist.plitter.track.domain.repository.TrackRepository;
-import com.playlist.plitter.track.infrastructure.spotify.SpotifyTrackClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -38,8 +34,6 @@ public class RecommendationsService {
     private final RecommendationsRepository recommendationsRepository;
     private final UserRepository userRepository;
     private final GuestUserRepository guestUserRepository;
-    private final TrackFeatureRepository trackFeatureRepository;
-    private final SpotifyTrackClient spotifyTrackClient;
 
     @Transactional
     public RecommendationCreateResponse createRecommendation(
@@ -97,7 +91,6 @@ public class RecommendationsService {
                         .albumCoverUrl(request.albumCoverImageUrl())
                         .previewUrl(request.previewUrl())
                         .build()));
-        saveTrackFeatureIfAbsent(track);
 
         RecommendationsEntity recommendation = RecommendationsEntity.builder()
                 .playlist(playlist)
@@ -117,34 +110,6 @@ public class RecommendationsService {
                 playlist.getId(),
                 savedRecommendation.getCreatedAt()
         );
-    }
-
-    private void saveTrackFeatureIfAbsent(TrackEntity track) {
-        try {
-            if (trackFeatureRepository.existsByTrack(track)) {
-                return;
-            }
-
-            String genre = spotifyTrackClient.getTrackGenre(track.getSpotifyTrackId());
-            TrackFeatureEntity trackFeature = TrackFeatureEntity.builder()
-                    .track(track)
-                    .bpm(null)
-                    .mood(null)
-                    .genre(genre)
-                    .energy(null)
-                    .valence(null)
-                    .rawFeatureJson("{\"genre\":\"" + escapeJson(genre) + "\"}")
-                    .fetchedAt(LocalDateTime.now())
-                    .build();
-
-            trackFeatureRepository.save(trackFeature);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String escapeJson(String value) {
-        return value == null ? "" : value.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 
     @Transactional(readOnly = true)

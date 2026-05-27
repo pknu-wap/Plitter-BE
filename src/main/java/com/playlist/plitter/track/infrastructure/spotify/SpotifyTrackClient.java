@@ -10,8 +10,6 @@ import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.enums.ModelObjectType;
 import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
 import se.michaelthelin.spotify.model_objects.special.SearchResult;
-import se.michaelthelin.spotify.model_objects.specification.Artist;
-import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
 import se.michaelthelin.spotify.model_objects.specification.Image;
 import se.michaelthelin.spotify.model_objects.specification.Track;
 import se.michaelthelin.spotify.exceptions.detailed.UnauthorizedException;
@@ -75,22 +73,6 @@ public class SpotifyTrackClient {
         }
     }
 
-    public String getTrackGenre(String spotifyTrackId) {
-        try {
-            SpotifyApi spotifyApi = createSpotifyApi();
-
-            Track track = spotifyApi.getTrack(spotifyTrackId)
-                    .build()
-                    .execute();
-
-            return getGenre(spotifyApi, track);
-        } catch (UnauthorizedException e) {
-            throw new ApiException(TrackErrorCode.SPOTIFY_UNAUTHORIZED);
-        } catch (Exception e) {
-            throw new ApiException(TrackErrorCode.TRACK_FEATURE_FETCH_FAILED);
-        }
-    }
-
     private SpotifyApi createSpotifyApi() throws Exception {
         SpotifyApi spotifyApi = new SpotifyApi.Builder()
                 .setClientId(clientId)
@@ -102,23 +84,5 @@ public class SpotifyTrackClient {
 
         spotifyApi.setAccessToken(clientCredentials.getAccessToken());
         return spotifyApi;
-    }
-
-    private String getGenre(SpotifyApi spotifyApi, Track track) throws Exception {
-        ArtistSimplified[] artists = track.getArtists();
-        if (artists == null || artists.length == 0 || artists[0].getId() == null) {
-            return "unknown";
-        }
-
-        Artist artist = spotifyApi.getArtist(artists[0].getId())
-                .build()
-                .execute();
-        String[] genres = artist.getGenres();
-        if (genres == null || genres.length == 0) {
-            return "unknown";
-        }
-
-        String genre = String.join(", ", genres);
-        return genre.length() > 100 ? genre.substring(0, 100) : genre;
     }
 }
