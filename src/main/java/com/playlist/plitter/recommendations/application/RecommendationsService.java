@@ -5,6 +5,7 @@ import com.playlist.plitter.auth.domain.repository.UserRepository;
 import com.playlist.plitter.auth.exception.AuthErrorCode;
 import com.playlist.plitter.guest.entity.GuestUserEntity;
 import com.playlist.plitter.guest.repository.GuestUserRepository;
+import com.playlist.plitter.guest.service.NicknameGenerator;
 import com.playlist.plitter.playlist.domain.entity.PlaylistEntity;
 import com.playlist.plitter.playlist.domain.repository.PlaylistRepository;
 import com.playlist.plitter.global.exception.ApiException;
@@ -46,7 +47,8 @@ public class RecommendationsService {
 
         UserEntity recommenderUser = null;
         String guestToken = request.guestToken();
-        String randomNickname = request.randomNickname();
+        String randomNickname = null;
+        boolean isAnonymous = request.isAnonymous();
 
         if (recommenderUserId != null) {
             recommenderUser = userRepository.findById(recommenderUserId)
@@ -58,7 +60,9 @@ public class RecommendationsService {
             }
 
             guestToken = null;
-            randomNickname = null;
+            if (isAnonymous) {
+                randomNickname = NicknameGenerator.generate(guestUserRepository);
+            }
         } else {
             if (guestToken == null || guestToken.isBlank()) {
                 throw new ApiException(RecommendationsErrorCode.GUEST_TOKEN_REQUIRED);
@@ -68,6 +72,7 @@ public class RecommendationsService {
             GuestUserEntity guest = guestUserRepository.findByGuestToken(guestToken)
                     .orElseThrow(() -> new ApiException(RecommendationsErrorCode.GUEST_NOT_FOUND));
             randomNickname = guest.getRandomNickname();
+            isAnonymous = true;
 
             long recommendationCount = recommendationsRepository.countByPlaylistAndGuestToken(playlist, guestToken);
             if (recommendationCount >= GUEST_RECOMMENDATION_LIMIT_PER_PLAYLIST) {
@@ -98,7 +103,7 @@ public class RecommendationsService {
                 .recommenderUser(recommenderUser)
                 .guestToken(guestToken)
                 .randomNickname(randomNickname)
-                .isAnonymous(request.isAnonymous())
+                .isAnonymous(isAnonymous)
                 .comment(request.comment())
                 .build();
 
