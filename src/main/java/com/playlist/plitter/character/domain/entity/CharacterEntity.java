@@ -6,6 +6,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -35,6 +37,7 @@ public class CharacterEntity {
     @Column(name = "prompt_text", columnDefinition = "TEXT")
     private String promptText;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "feature_summary_json", columnDefinition = "jsonb")
     private String featureSummaryJson;
 
