@@ -87,7 +87,7 @@ public class SpotifyTrackClient {
         } catch (UnauthorizedException e) {
             throw new ApiException(TrackErrorCode.SPOTIFY_UNAUTHORIZED);
         } catch (Exception e) {
-            throw new ApiException(TrackErrorCode.TRACK_SEARCH_FAILED);
+            throw new ApiException(TrackErrorCode.TRACK_FEATURE_FETCH_FAILED);
         }
     }
 
