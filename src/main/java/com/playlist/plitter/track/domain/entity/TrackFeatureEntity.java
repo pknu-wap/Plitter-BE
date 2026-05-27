@@ -3,6 +3,8 @@ package com.playlist.plitter.track.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -42,6 +44,7 @@ public class TrackFeatureEntity {
     @Column(name = "valence", precision = 5, scale = 2)
     private BigDecimal valence;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "raw_feature_json", columnDefinition = "jsonb")
     private String rawFeatureJson;
 

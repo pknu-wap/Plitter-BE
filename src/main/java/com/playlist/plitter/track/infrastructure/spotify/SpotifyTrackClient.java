@@ -12,9 +12,9 @@ import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
 import se.michaelthelin.spotify.model_objects.special.SearchResult;
 import se.michaelthelin.spotify.model_objects.specification.Image;
 import se.michaelthelin.spotify.model_objects.specification.Track;
+import se.michaelthelin.spotify.exceptions.detailed.UnauthorizedException;
 import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 import se.michaelthelin.spotify.requests.data.search.SearchItemRequest;
-import se.michaelthelin.spotify.exceptions.detailed.UnauthorizedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,15 +31,7 @@ public class SpotifyTrackClient {
 
     public List<TrackSearchResponse> searchTracks(String keyword, Integer limit) {
         try {
-            SpotifyApi spotifyApi = new SpotifyApi.Builder()
-                    .setClientId(clientId)
-                    .setClientSecret(clientSecret)
-                    .build();
-
-            ClientCredentialsRequest clientCredentialsRequest = spotifyApi.clientCredentials().build();
-            ClientCredentials clientCredentials = clientCredentialsRequest.execute();
-
-            spotifyApi.setAccessToken(clientCredentials.getAccessToken());
+            SpotifyApi spotifyApi = createSpotifyApi();
 
             SearchItemRequest searchItemRequest = spotifyApi.searchItem(keyword, ModelObjectType.TRACK.getType())
                     .limit(limit)
@@ -79,5 +71,18 @@ public class SpotifyTrackClient {
         } catch (Exception e) {
             throw new ApiException(TrackErrorCode.TRACK_SEARCH_FAILED);
         }
+    }
+
+    private SpotifyApi createSpotifyApi() throws Exception {
+        SpotifyApi spotifyApi = new SpotifyApi.Builder()
+                .setClientId(clientId)
+                .setClientSecret(clientSecret)
+                .build();
+
+        ClientCredentialsRequest clientCredentialsRequest = spotifyApi.clientCredentials().build();
+        ClientCredentials clientCredentials = clientCredentialsRequest.execute();
+
+        spotifyApi.setAccessToken(clientCredentials.getAccessToken());
+        return spotifyApi;
     }
 }
