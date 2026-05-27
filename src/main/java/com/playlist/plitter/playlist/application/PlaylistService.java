@@ -83,8 +83,8 @@ public class PlaylistService {
 
         return new PlaylistResponse(
                 playlist.getId(),
-                recommendations.size(),
-                recommendations.size() >= 10,
+                playlist.getRecommendationCount(),
+                playlist.getRecommendationCount() >= 10,
                 recommendations
         );
     }

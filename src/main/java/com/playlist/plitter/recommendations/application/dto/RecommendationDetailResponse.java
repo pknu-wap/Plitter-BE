@@ -40,9 +40,9 @@ public record RecommendationDetailResponse(
             String comment
     ) {
         public static CommentResponse from(RecommendationsEntity recommendation) {
-            String recommenderName = recommendation.getRecommenderUser() != null
-                    ? recommendation.getRecommenderUser().getNickname()
-                    : recommendation.getRandomNickname();
+            String recommenderName = recommendation.isAnonymous() || recommendation.getRecommenderUser() == null
+                    ? recommendation.getRandomNickname()
+                    : recommendation.getRecommenderUser().getNickname();
 
             return new CommentResponse(recommenderName, recommendation.getComment());
         }

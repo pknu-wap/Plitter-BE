@@ -7,16 +7,17 @@ import com.playlist.plitter.track.domain.repository.TrackRepository;
 import com.playlist.plitter.track.infrastructure.lastfm.LastFmTagBundle;
 import com.playlist.plitter.track.infrastructure.lastfm.LastFmTagClient;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TrackFeatureEnrichmentService {
+    private static final Logger log = LoggerFactory.getLogger(TrackFeatureEnrichmentService.class);
 
     private final TrackRepository trackRepository;
     private final TrackFeatureRepository trackFeatureRepository;
