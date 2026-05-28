@@ -1,7 +1,9 @@
 package com.playlist.plitter.track.application;
 
 import com.playlist.plitter.global.exception.ApiException;
+import com.playlist.plitter.track.application.dto.TrackPlayResponse;
 import com.playlist.plitter.track.application.dto.TrackSearchResponse;
+import com.playlist.plitter.track.domain.repository.TrackRepository;
 import com.playlist.plitter.track.exception.TrackErrorCode;
 import com.playlist.plitter.track.infrastructure.spotify.SpotifyTrackClient;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import java.util.List;
 public class TrackService {
 
     private final SpotifyTrackClient spotifyTrackClient;
+    private final TrackRepository trackRepository;
 
     public List<TrackSearchResponse> searchTracks(String keyword, Integer limit) {
         if (keyword == null || keyword.isBlank()) {
@@ -28,5 +31,17 @@ public class TrackService {
             throw new ApiException(TrackErrorCode.TRACK_SEARCH_FAILED);
 
         }
+    }
+
+    public TrackPlayResponse getTrackEmbedUrl(String spotifyTrackId) {
+        if (spotifyTrackId == null || spotifyTrackId.isBlank()) {
+            throw new ApiException(TrackErrorCode.INVALID_REQUEST);
+        }
+
+        trackRepository.findBySpotifyTrackId(spotifyTrackId)
+                .orElseThrow(() -> new ApiException(TrackErrorCode.TRACK_NOT_FOUND));
+
+        String embedUrl = "https://open.spotify.com/embed/track/" + spotifyTrackId;
+        return new TrackPlayResponse(spotifyTrackId, embedUrl);
     }
 }
