@@ -26,13 +26,17 @@ public class CharacterEditSpecGenerator {
             String primaryGenre = root.path("primaryGenre").asText("balanced");
 
             String styleTone = createStyleTone(avgBpm, avgEnergy, avgValence);
+            String styleDirection = createStyleDirection(styleTone);
             String promptText = String.format(
-                    "Apply a %s visual mood based on %s genre, avgBpm %.1f, avgEnergy %.2f, avgValence %.2f.",
+                    "Edit the character to match %s style from %s genre (avgBpm %.1f, avgEnergy %.2f, avgValence %.2f). " +
+                            "Do not only change the background. Update the character itself: outfit, accessories, hairstyle, facial expression, and color palette. " +
+                            "%s Keep the original character silhouette, body proportions, and readability.",
                     styleTone,
                     primaryGenre,
                     avgBpm,
                     avgEnergy,
-                    avgValence
+                    avgValence,
+                    styleDirection
             );
             return new CharacterEditSpec(promptText, styleTone);
         } catch (Exception e) {
@@ -48,5 +52,18 @@ public class CharacterEditSpecGenerator {
             return "calm-deep";
         }
         return "balanced";
+    }
+
+    private String createStyleDirection(String styleTone) {
+        return switch (styleTone) {
+            case "energetic-bright" ->
+                    "Use vivid accents, sporty streetwear, playful accessories, and an upbeat expression.";
+            case "energetic-intense" ->
+                    "Use bold contrast, edgy outfit details, statement accessories, and a sharp expression.";
+            case "calm-deep" ->
+                    "Use muted colors, minimal and soft outfit details, subtle accessories, and a calm expression.";
+            default ->
+                    "Use balanced everyday styling with moderate colors and clean accessory details.";
+        };
     }
 }
