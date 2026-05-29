@@ -7,6 +7,7 @@ import com.playlist.plitter.character.application.port.BaseCharacterClient;
 import com.playlist.plitter.character.application.port.CharacterImageEditClient;
 import com.playlist.plitter.character.application.port.ImageStorageClient;
 import com.playlist.plitter.character.application.port.MusicFeatureClient;
+import com.playlist.plitter.character.application.dto.CharacterResultMetadata;
 import com.playlist.plitter.character.application.port.dto.CharacterEditSpec;
 import com.playlist.plitter.character.application.port.dto.CharacterImageEditRequest;
 import com.playlist.plitter.character.application.port.dto.DownloadUrlResult;
@@ -40,6 +41,7 @@ public class CharacterService {
     private final PlaylistRepository playlistRepository;
     private final MusicFeatureClient musicFeatureClient;
     private final CharacterEditSpecGenerator characterEditSpecGenerator;
+    private final CharacterResultMetadataGenerator characterResultMetadataGenerator;
     private final BaseCharacterClient baseCharacterClient;
     private final CharacterImageEditClient characterImageEditClient;
     private final ImageStorageClient imageStorageClient;
@@ -70,26 +72,42 @@ public class CharacterService {
         String editedCharacterImageUrl = editCharacterImage(editSpec);
         String storedCharacterImageUrl = storeCharacterImage(playlistId, editedCharacterImageUrl);
 
-        return saveCharacterWithTransaction(
+        CharacterEntity savedCharacter = saveCharacterWithTransaction(
                 playlistId,
                 storedCharacterImageUrl,
                 editSpec.promptText(),
                 featureSummaryJson
         );
+        CharacterResultMetadata metadata = generateResultMetadata(savedCharacter.getFeatureSummaryJson());
+        return new CharacterCreateResponse(
+                savedCharacter.getId(),
+                savedCharacter.getImageUrl(),
+                metadata.characterName(),
+                metadata.tags()
+        );
     }
 
     public CharacterDetailResponse getCharacter(Long playlistId) {
         CharacterEntity character = getLatestCreatedCharacterOrThrow(playlistId);
-        return new CharacterDetailResponse(character.getId(), character.getImageUrl());
+        CharacterResultMetadata metadata = generateResultMetadata(character.getFeatureSummaryJson());
+        return new CharacterDetailResponse(
+                character.getId(),
+                character.getImageUrl(),
+                metadata.characterName(),
+                metadata.tags()
+        );
     }
 
     public CharacterDownloadUrlResponse getCharacterDownloadUrl(Long playlistId) {
         CharacterEntity character = getLatestCreatedCharacterOrThrow(playlistId);
         DownloadUrlResult downloadUrlResult = imageStorageClient.createDownloadUrl(character.getImageUrl());
+        CharacterResultMetadata metadata = generateResultMetadata(character.getFeatureSummaryJson());
         return new CharacterDownloadUrlResponse(
                 downloadUrlResult.downloadUrl(),
                 character.getImageUrl(),
-                downloadUrlResult.expiresAt()
+                downloadUrlResult.expiresAt(),
+                metadata.characterName(),
+                metadata.tags()
         );
     }
 
@@ -158,7 +176,7 @@ public class CharacterService {
         return value;
     }
 
-    private CharacterCreateResponse saveCharacterWithTransaction(
+    private CharacterEntity saveCharacterWithTransaction(
             Long playlistId,
             String storedCharacterImageUrl,
             String promptText,
@@ -167,7 +185,7 @@ public class CharacterService {
         for (int attempt = 1; attempt <= SAVE_RETRY_COUNT; attempt++) {
             try {
                 TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-                CharacterCreateResponse response = transactionTemplate.execute(status -> {
+                CharacterEntity response = transactionTemplate.execute(status -> {
                     PlaylistEntity managedPlaylist = getPlaylistOrThrow(playlistId);
                     int nextVersion = characterRepository.findTopByPlaylist_IdOrderByVersionDesc(playlistId)
                             .map(character -> character.getVersion() + 1)
@@ -182,7 +200,7 @@ public class CharacterService {
                                     featureSummaryJson
                             )
                     );
-                    return new CharacterCreateResponse(savedCharacter.getId(), savedCharacter.getImageUrl());
+                    return savedCharacter;
                 });
                 return Objects.requireNonNull(response);
             } catch (DataIntegrityViolationException e) {
@@ -192,5 +210,9 @@ public class CharacterService {
             }
         }
         throw new ApiException(CharacterErrorCode.CHARACTER_GENERATION_FAILED);
+    }
+
+    private CharacterResultMetadata generateResultMetadata(String featureSummaryJson) {
+        return characterResultMetadataGenerator.generate(featureSummaryJson);
     }
 }
