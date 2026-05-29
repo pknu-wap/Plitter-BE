@@ -37,6 +37,20 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
     private static final Logger log = LoggerFactory.getLogger(OpenAiCharacterImageEditClient.class);
     private static final String IMAGE_EDIT_PATH = "/v1/images/edits";
     private static final String DEFAULT_IMAGE_MEDIA_TYPE = "image/png";
+    private static final String SHAPE_PRESERVATION_RULES =
+            "Strict character constraints: keep the same base character identity and silhouette. " +
+                    "Keep the same body framework, limb count, limb placement, and overall proportions. " +
+                    "Keep the star outline fully readable and do not occlude major silhouette points with large accessories. " +
+                    "Do not redesign into a different species, humanoid body, or new character archetype. " +
+                    "Only apply style-level variations (expression, outfit details, accessories, compact visual marks). " +
+                    "Keep a rough hand-drawn doodle line-art look. " +
+                    "Do not fill the character body with solid colors. " +
+                    "Do not fill the background with colors. " +
+                    "Do not apply any color fills to character parts or accessories. " +
+                    "Keep output strictly monochrome with black or dark-gray lines only. " +
+                    "Prefer black or dark-gray thin stroke lines, minimal shading, and a plain background. " +
+                    "Avoid heavy cross-hatching or dense sketch textures. " +
+                    "Output exactly one full-body character.";
 
     private final String openAiApiKey;
     private final String openAiModel;
@@ -95,7 +109,7 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
 
             MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
             formData.add("model", openAiModel);
-            formData.add("prompt", request.editSpec().promptText());
+            formData.add("prompt", buildPrompt(request.editSpec().promptText()));
             formData.add("size", openAiSize);
             formData.add("quality", openAiQuality);
             formData.add("n", "1");
@@ -146,6 +160,10 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
         requestFactory.setConnectTimeout(Duration.ofMillis(safeTimeout));
         requestFactory.setReadTimeout(Duration.ofMillis(safeTimeout));
         return requestFactory;
+    }
+
+    private String buildPrompt(String promptText) {
+        return SHAPE_PRESERVATION_RULES + " " + promptText;
     }
 
     private MediaType resolveImageMediaType(MediaType sourceMediaType) {
