@@ -82,10 +82,6 @@ public class RecommendationMusicFeatureClient implements MusicFeatureClient {
             if (feature == null) {
                 continue;
             }
-            if (feature.getBpm() != null) {
-                summary.bpmSum += feature.getBpm().doubleValue();
-                summary.bpmCount++;
-            }
             if (feature.getEnergy() != null) {
                 summary.energySum += feature.getEnergy().doubleValue();
                 summary.energyCount++;
@@ -112,7 +108,6 @@ public class RecommendationMusicFeatureClient implements MusicFeatureClient {
         payload.put("playlistId", playlistId);
         payload.put("trackCount", trackCount);
         payload.put("analyzedTrackCount", analyzedTrackCount);
-        payload.put("avgBpm", average(summary.bpmSum, summary.bpmCount));
         payload.put("avgEnergy", average(summary.energySum, summary.energyCount));
         payload.put("avgValence", average(summary.valenceSum, summary.valenceCount));
         payload.put("primaryGenre", findPrimaryGenre(summary.genreCounts));
@@ -147,8 +142,6 @@ public class RecommendationMusicFeatureClient implements MusicFeatureClient {
     }
 
     private static class SummaryAccumulator {
-        private double bpmSum;
-        private int bpmCount;
         private double energySum;
         private int energyCount;
         private double valenceSum;

@@ -29,9 +29,6 @@ public class TrackFeatureEntity {
     @JoinColumn(name = "track_id", nullable = false, unique = true)
     private TrackEntity track;
 
-    @Column(name = "bpm", precision = 6, scale = 2)
-    private BigDecimal bpm;
-
     @Column(name = "mood", length = 100)
     private String mood;
 
@@ -68,7 +65,6 @@ public class TrackFeatureEntity {
     @Builder
     public TrackFeatureEntity(
             TrackEntity track,
-            BigDecimal bpm,
             String mood,
             String genre,
             BigDecimal energy,
@@ -79,7 +75,6 @@ public class TrackFeatureEntity {
             LocalDateTime fetchedAt
     ) {
         this.track = track;
-        this.bpm = bpm;
         this.mood = mood;
         this.genre = genre;
         this.energy = energy;
@@ -91,7 +86,6 @@ public class TrackFeatureEntity {
     }
 
     public void updateMetadataFeatures(
-            BigDecimal bpm,
             String mood,
             String genre,
             BigDecimal energy,
@@ -101,7 +95,6 @@ public class TrackFeatureEntity {
             String rawFeatureJson,
             LocalDateTime fetchedAt
     ) {
-        this.bpm = bpm;
         this.mood = mood;
         this.genre = genre;
         this.energy = energy;

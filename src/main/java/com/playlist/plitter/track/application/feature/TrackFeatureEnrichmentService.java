@@ -39,7 +39,6 @@ public class TrackFeatureEnrichmentService {
                 .orElseGet(() -> TrackFeatureEntity.builder().track(track).build());
 
         trackFeature.updateMetadataFeatures(
-                null,
                 estimated.mood(),
                 estimated.genre(),
                 estimated.energy(),
