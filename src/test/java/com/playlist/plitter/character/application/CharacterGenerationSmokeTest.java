@@ -36,8 +36,9 @@ class CharacterGenerationSmokeTest {
     @Test
     void createCharacter_generatesAndPersistsCharacter() {
         Long playlistId = findCreatablePlaylistId();
+        Long requesterUserId = findOwnerUserId(playlistId);
 
-        CharacterCreateResponse response = characterService.createCharacter(playlistId);
+        CharacterCreateResponse response = characterService.createCharacter(playlistId, requesterUserId);
         Long characterId = response.characterId();
         String expectedStoredImageUrl = "https://mock.local/stored/" + playlistId + ".png";
 
@@ -68,6 +69,15 @@ class CharacterGenerationSmokeTest {
                 .stream()
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("캐릭터 생성 가능한 플레이리스트가 없습니다."));
+    }
+
+    private Long findOwnerUserId(Long playlistId) {
+        return entityManager.createQuery(
+                        "select p.owner.id from PlaylistEntity p where p.id = :playlistId",
+                        Long.class
+                )
+                .setParameter("playlistId", playlistId)
+                .getSingleResult();
     }
 
     @TestConfiguration

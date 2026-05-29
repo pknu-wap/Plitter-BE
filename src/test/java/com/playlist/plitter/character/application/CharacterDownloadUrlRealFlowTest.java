@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import jakarta.persistence.EntityManager;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -20,12 +21,16 @@ class CharacterDownloadUrlRealFlowTest {
     @Autowired
     private CharacterService characterService;
 
+    @Autowired
+    private EntityManager entityManager;
+
     @Test
     void getDownloadUrl_realFlow() throws Exception {
         String rawPlaylistId = System.getenv().getOrDefault("CHARACTER_REAL_FLOW_PLAYLIST_ID", "2");
         Long playlistId = Long.parseLong(rawPlaylistId);
+        Long requesterUserId = findOwnerUserId(playlistId);
 
-        CharacterDownloadUrlResponse response = characterService.getCharacterDownloadUrl(playlistId);
+        CharacterDownloadUrlResponse response = characterService.getCharacterDownloadUrl(playlistId, requesterUserId);
         assertThat(response.downloadUrl()).isNotBlank();
         assertThat(response.expiresAt()).isNotNull();
 
@@ -41,5 +46,14 @@ class CharacterDownloadUrlRealFlowTest {
                 + " status=" + httpResponse.statusCode()
                 + " expiresAt=" + response.expiresAt()
                 + " downloadUrl=" + response.downloadUrl());
+    }
+
+    private Long findOwnerUserId(Long playlistId) {
+        return entityManager.createQuery(
+                        "select p.owner.id from PlaylistEntity p where p.id = :playlistId",
+                        Long.class
+                )
+                .setParameter("playlistId", playlistId)
+                .getSingleResult();
     }
 }
