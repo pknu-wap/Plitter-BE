@@ -47,8 +47,8 @@ public class CharacterService {
     private final ImageStorageClient imageStorageClient;
     private final PlatformTransactionManager transactionManager;
 
-    public CharacterAvailabilityResponse getAvailability(Long playlistId) {
-        PlaylistEntity playlist = getPlaylistOrThrow(playlistId);
+    public CharacterAvailabilityResponse getAvailability(Long playlistId, Long requesterUserId) {
+        PlaylistEntity playlist = getOwnedPlaylistOrThrow(playlistId, requesterUserId);
         int currentCount = playlist.getRecommendationCount();
         int missingCount = Math.max(REQUIRED_RECOMMENDATION_COUNT - currentCount, 0);
 
@@ -61,8 +61,8 @@ public class CharacterService {
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public CharacterCreateResponse createCharacter(Long playlistId) {
-        PlaylistEntity playlist = getPlaylistOrThrow(playlistId);
+    public CharacterCreateResponse createCharacter(Long playlistId, Long requesterUserId) {
+        PlaylistEntity playlist = getOwnedPlaylistOrThrow(playlistId, requesterUserId);
         if (!isCreatable(playlist)) {
             throw new ApiException(CharacterErrorCode.CHARACTER_NOT_AVAILABLE);
         }
@@ -74,6 +74,7 @@ public class CharacterService {
 
         CharacterEntity savedCharacter = saveCharacterWithTransaction(
                 playlistId,
+                requesterUserId,
                 storedCharacterImageUrl,
                 editSpec.promptText(),
                 featureSummaryJson
@@ -87,8 +88,8 @@ public class CharacterService {
         );
     }
 
-    public CharacterDetailResponse getCharacter(Long playlistId) {
-        CharacterEntity character = getLatestCreatedCharacterOrThrow(playlistId);
+    public CharacterDetailResponse getCharacter(Long playlistId, Long requesterUserId) {
+        CharacterEntity character = getLatestCreatedCharacterOrThrow(playlistId, requesterUserId);
         CharacterResultMetadata metadata = generateResultMetadata(character.getFeatureSummaryJson());
         return new CharacterDetailResponse(
                 character.getId(),
@@ -98,8 +99,8 @@ public class CharacterService {
         );
     }
 
-    public CharacterDownloadUrlResponse getCharacterDownloadUrl(Long playlistId) {
-        CharacterEntity character = getLatestCreatedCharacterOrThrow(playlistId);
+    public CharacterDownloadUrlResponse getCharacterDownloadUrl(Long playlistId, Long requesterUserId) {
+        CharacterEntity character = getLatestCreatedCharacterOrThrow(playlistId, requesterUserId);
         DownloadUrlResult downloadUrlResult = imageStorageClient.createDownloadUrl(character.getImageUrl());
         CharacterResultMetadata metadata = generateResultMetadata(character.getFeatureSummaryJson());
         return new CharacterDownloadUrlResponse(
@@ -111,13 +112,13 @@ public class CharacterService {
         );
     }
 
-    private PlaylistEntity getPlaylistOrThrow(Long playlistId) {
-        return playlistRepository.findById(playlistId)
+    private PlaylistEntity getOwnedPlaylistOrThrow(Long playlistId, Long requesterUserId) {
+        return playlistRepository.findByIdAndOwner_Id(playlistId, requesterUserId)
                 .orElseThrow(() -> new ApiException(CharacterErrorCode.PLAYLIST_NOT_FOUND));
     }
 
-    private CharacterEntity getLatestCreatedCharacterOrThrow(Long playlistId) {
-        getPlaylistOrThrow(playlistId);
+    private CharacterEntity getLatestCreatedCharacterOrThrow(Long playlistId, Long requesterUserId) {
+        getOwnedPlaylistOrThrow(playlistId, requesterUserId);
         return characterRepository.findTopByPlaylist_IdOrderByCreatedAtDescIdDesc(playlistId)
                 .orElseThrow(() -> new ApiException(CharacterErrorCode.CHARACTER_NOT_FOUND));
     }
@@ -178,6 +179,7 @@ public class CharacterService {
 
     private CharacterEntity saveCharacterWithTransaction(
             Long playlistId,
+            Long requesterUserId,
             String storedCharacterImageUrl,
             String promptText,
             String featureSummaryJson
@@ -186,7 +188,7 @@ public class CharacterService {
             try {
                 TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
                 CharacterEntity response = transactionTemplate.execute(status -> {
-                    PlaylistEntity managedPlaylist = getPlaylistOrThrow(playlistId);
+                    PlaylistEntity managedPlaylist = getOwnedPlaylistOrThrow(playlistId, requesterUserId);
                     int nextVersion = characterRepository.findTopByPlaylist_IdOrderByVersionDesc(playlistId)
                             .map(character -> character.getVersion() + 1)
                             .orElse(1);

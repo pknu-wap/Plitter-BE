@@ -14,6 +14,7 @@ import java.util.Optional;
 public interface PlaylistRepository extends JpaRepository<PlaylistEntity, Long> {
     boolean existsByOwner(UserEntity owner);
     Optional<PlaylistEntity> findByOwnerId(Long ownerId);
+    Optional<PlaylistEntity> findByIdAndOwner_Id(Long playlistId, Long ownerId);
 
     @Modifying
     @Query("update PlaylistEntity p set p.recommendationCount = p.recommendationCount + 1 where p = :playlist")
