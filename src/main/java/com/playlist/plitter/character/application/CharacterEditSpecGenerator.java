@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class CharacterEditSpecGenerator {
 
-    private static final double HIGH_BPM_THRESHOLD = 120.0;
     private static final double HIGH_ENERGY_THRESHOLD = 0.65;
     private static final double HIGH_VALENCE_THRESHOLD = 0.60;
     private static final double LOW_VALENCE_THRESHOLD = 0.40;
@@ -20,12 +19,11 @@ public class CharacterEditSpecGenerator {
     public CharacterEditSpec generate(String featureSummaryJson) {
         try {
             JsonNode root = objectMapper.readTree(featureSummaryJson);
-            double avgBpm = root.path("avgBpm").asDouble(0.0);
             double avgEnergy = root.path("avgEnergy").asDouble(0.0);
             double avgValence = root.path("avgValence").asDouble(0.0);
             String primaryGenre = root.path("primaryGenre").asText("balanced");
 
-            String styleTone = createStyleTone(avgBpm, avgEnergy, avgValence);
+            String styleTone = createStyleTone(avgEnergy, avgValence);
             String styleDirection = createStyleDirection(styleTone);
             String promptText = String.format(
                     """
@@ -34,7 +32,6 @@ public class CharacterEditSpecGenerator {
                     Edit the character to reflect the given music mood:
                     - Genre inspiration: %s
                     - Style tone: %s
-                    - avgBpm: %.1f
                     - avgEnergy: %.2f
                     - avgValence: %.2f
                     Character preservation rules:
@@ -73,7 +70,6 @@ public class CharacterEditSpecGenerator {
                     """,
                     primaryGenre,
                     styleTone,
-                    avgBpm,
                     avgEnergy,
                     avgValence,
                     styleDirection
@@ -84,8 +80,8 @@ public class CharacterEditSpecGenerator {
         }
     }
 
-    private String createStyleTone(double avgBpm, double avgEnergy, double avgValence) {
-        if (avgEnergy >= HIGH_ENERGY_THRESHOLD || avgBpm >= HIGH_BPM_THRESHOLD) {
+    private String createStyleTone(double avgEnergy, double avgValence) {
+        if (avgEnergy >= HIGH_ENERGY_THRESHOLD) {
             return avgValence >= HIGH_VALENCE_THRESHOLD ? "energetic-bright" : "energetic-intense";
         }
         if (avgValence <= LOW_VALENCE_THRESHOLD) {
