@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 public class CharacterEditSpecGenerator {
 
     private static final double HIGH_ENERGY_THRESHOLD = 0.65;
+    private static final double LOW_ENERGY_THRESHOLD = 0.45;
     private static final double HIGH_VALENCE_THRESHOLD = 0.60;
     private static final double LOW_VALENCE_THRESHOLD = 0.40;
 
@@ -24,11 +25,11 @@ public class CharacterEditSpecGenerator {
             String genreHint = toGenreHint(root.path("primaryGenre").asText("balanced"));
 
             String styleTone = createStyleTone(avgEnergy, avgValence);
-            String styleDirection = createStyleDirection(styleTone);
+            String styleDirection = createStyleDirection(styleTone, genreHint);
             String promptText = String.format(
                     """
                     The base character is a simple hand-drawn doodle star mascot with a five-point star body, thin stick-like arms and legs, tiny hands and feet, and a minimal face.
-                    Modify this same mascot from the input image; do not redraw or regenerate a new character.
+                    Edit the existing mascot while preserving its original silhouette, pose, proportions, and line style as closely as possible.
                     Adjust the character to reflect the given music mood:
                     - Genre inspiration: %s
                     - Style tone: %s
@@ -44,21 +45,11 @@ public class CharacterEditSpecGenerator {
                     - Add one or two compact accessories attached to the character.
                     - Add two or three tiny mood marks around the character (each shorter than one star tip length).
                     Rendering style rules:
-                    - The stroke must look like a single clean ink line drawn with a 0.3mm fineliner pen.
-                    - Each stroke must have sharp clean edges with no fuzziness, no texture, and no variation in opacity.
-                    - Keep line thickness consistently thin and sharp.
-                    - Do not use pencil, crayon, charcoal, chalk, marker, brush, or any soft/fuzzy/textured stroke style.
-                    - Slight wobble in line direction is allowed, but keep stroke thickness thin and consistent.
-                    - Keep the star silhouette slightly imperfect and asymmetric, not geometrically precise.
-                    - Keep the overall drawing like a quick pen doodle: light and fast, not heavy or labored.
-                    - Every line in body, accessories, and details must follow the same thin ink stroke style.
-                    - Never use solid flat fill.
-                    - If filling an accessory area, use at most 3 to 5 loosely spaced parallel lines.
-                    - Hatching lines must be sparse and light, not dense or dark.
-                    - Leave visible white space between hatching lines.
-                    - Never use shaded texture or dense fill patterns.
-                    - No smooth shading, no gradients, and no 3D rendering.
-                    - Monochrome only: thin dark ink lines on plain white background.
+                    - Line style must remain monochrome thin clean ink: consistent 0.3mm fineliner-like strokes, sharp edges, no fuzzy texture, no opacity variation, and no marker/brush/pencil effect.
+                    - Slight wobble in line direction is allowed, but keep the stroke thin and consistent.
+                    - No gradients, no 3D rendering, and no paper texture.
+                    - Transparent background.
+                    - Avoid solid filled areas. If an accessory needs interior detail, use sparse simple line hatching only.
                     Style direction:
                     %s
                     Important:
@@ -79,7 +70,7 @@ public class CharacterEditSpecGenerator {
         if (avgEnergy >= HIGH_ENERGY_THRESHOLD) {
             return avgValence >= HIGH_VALENCE_THRESHOLD ? "energetic-bright" : "energetic-intense";
         }
-        if (avgValence <= LOW_VALENCE_THRESHOLD) {
+        if (avgEnergy <= LOW_ENERGY_THRESHOLD && avgValence <= LOW_VALENCE_THRESHOLD) {
             return "calm-deep";
         }
         return "balanced";
@@ -99,16 +90,16 @@ public class CharacterEditSpecGenerator {
         };
     }
 
-    private String createStyleDirection(String styleTone) {
+    private String createStyleDirection(String styleTone, String genreHint) {
         return switch (styleTone) {
             case "energetic-bright" ->
-                    "Set expression to a wide smile with open bright eyes; add one small sporty accessory on the top star tip and up to three tiny sparkle or bounce lines.";
+                    "Use a bright lively expression with one small sporty accessory near the upper area, attached lightly without covering any star tip, and up to three tiny upbeat marks.";
             case "energetic-intense" ->
-                    "Set expression to focused eyes with slightly lowered brows; add one compact accessory such as tiny sunglasses or a thin headband and at most three short sharp motion lines.";
+                    "Use a focused intense expression inspired by " + genreHint + ", choose one compact accessory that fits the mood, and add at most three short sharp motion lines.";
             case "calm-deep" ->
-                    "Set expression to half-closed eyes with a small neutral mouth; add one small accessory such as tiny headphones or a thin scarf and up to two soft floating marks.";
+                    "Use a calm introspective expression inspired by " + genreHint + ", choose one small accessory that fits the mood, and add up to two soft floating marks.";
             default ->
-                    "Set expression to a relaxed friendly face; optionally add one tiny everyday accessory and up to two subtle mood marks.";
+                    "Use a relaxed natural expression inspired by " + genreHint + ", optionally add one tiny accessory, and add up to two subtle mood marks.";
         };
     }
 }
