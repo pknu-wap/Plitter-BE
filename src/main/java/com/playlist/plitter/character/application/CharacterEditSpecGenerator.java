@@ -44,15 +44,18 @@ public class CharacterEditSpecGenerator {
                     - Add one or two compact accessories attached to the character.
                     - Add two or three tiny mood marks around the character (each shorter than one star tip length).
                     Rendering style rules:
-                    - Draw with a fine-tip felt pen or thin ink pen, using clean and sharp lightweight strokes.
-                    - Keep line thickness consistently thin and sharp, with no texture inside each stroke.
+                    - The stroke must look like a single clean ink line drawn with a 0.3mm fineliner pen.
+                    - Each stroke must have sharp clean edges with no fuzziness, no texture, and no variation in opacity.
+                    - Keep line thickness consistently thin and sharp.
                     - Do not use pencil, crayon, charcoal, chalk, marker, brush, or any soft/fuzzy/textured stroke style.
                     - Slight wobble in line direction is allowed, but keep stroke thickness thin and consistent.
                     - Keep the star silhouette slightly imperfect and asymmetric, not geometrically precise.
                     - Keep the overall drawing like a quick pen doodle: light and fast, not heavy or labored.
                     - Every line in body, accessories, and details must follow the same thin ink stroke style.
                     - Never use solid flat fill.
-                    - If darkening a small accessory area, use only a few quick overlapping thin ink hatching lines.
+                    - If filling an accessory area, use at most 3 to 5 loosely spaced parallel lines.
+                    - Hatching lines must be sparse and light, not dense or dark.
+                    - Leave visible white space between hatching lines.
                     - Never use shaded texture or dense fill patterns.
                     - No smooth shading, no gradients, and no 3D rendering.
                     - Monochrome only: thin dark ink lines on plain white background.
