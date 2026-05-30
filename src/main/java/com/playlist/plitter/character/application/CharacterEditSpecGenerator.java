@@ -37,6 +37,8 @@ public class CharacterEditSpecGenerator {
                     - Keep limb count, limb placement, and full-body composition exactly the same as input.
                     - Keep the exact drawing style of the input image (line weight, stroke texture, and rendering style).
                     - Keep exactly one character; do not change character type or species.
+                    - Accessories must not cover or obscure any star tip.
+                    - Keep all accessories smaller than one star-tip length.
                     Allowed edits:
                     - Modify facial expression only.
                     - Add one or two compact accessories attached to the character.
@@ -48,9 +50,12 @@ public class CharacterEditSpecGenerator {
                     - Vary stroke weight slightly; lines may overshoot at corners or remain open.
                     - The star silhouette should be slightly imperfect and asymmetric, not geometrically precise.
                     - The drawing should feel spontaneous and unfinished, not clean or polished.
-                    - No solid fills, no shading, no gradients, no 3D rendering.
+                    - Every single line in the image (body, accessories, details) must use the same thin ballpoint-style stroke.
+                    - No part of the image may use thick brush, marker, charcoal, or crayon-like strokes.
+                    - Never use solid flat fill.
+                    - If darkening a small accessory area, use quick rough hatching lines as fast overlapping pen strokes.
+                    - No smooth shading, no gradients, and no 3D rendering.
                     - Monochrome only: thin dark pencil or ballpoint pen lines on plain white background.
-                    - Do not use marker, brush, charcoal, or any thick/textured stroke style.
                     Style direction:
                     %s
                     Important:

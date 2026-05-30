@@ -42,6 +42,7 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
                     "Modify the provided character only; do not regenerate a different character from scratch. " +
                     "Keep the same body framework, limb count, limb placement, and overall proportions. " +
                     "Keep the star outline fully readable and do not occlude major silhouette points with large accessories. " +
+                    "Accessories must not cover any star tip and must stay smaller than one star-tip length. " +
                     "Do not redesign into a different species, humanoid body, or new character archetype. " +
                     "Only apply style-level variations (expression, outfit details, accessories, compact visual marks). " +
                     "Preserve the exact drawing style of input image, including line weight, stroke texture, and rendering style. " +
@@ -51,9 +52,11 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
                     "Do not fill the character body with solid colors. " +
                     "Do not fill the background with colors. " +
                     "Do not apply any color fills to character parts or accessories. " +
+                    "Never use solid flat fill on accessories; if darkening is needed, use quick rough pen hatching only. " +
                     "Keep output strictly monochrome with black or dark-gray lines only. " +
                     "Prefer black or dark-gray thin stroke lines, minimal shading, and a plain background. " +
-                    "Avoid heavy cross-hatching or dense sketch textures. " +
+                    "Every line (body/accessories/details) must keep the same thin ballpoint-like stroke style; avoid thick marker/brush/charcoal/crayon texture. " +
+                    "Avoid heavy dense hatching or polished rendering. " +
                     "Output exactly one full-body character.";
 
     private final String openAiApiKey;
