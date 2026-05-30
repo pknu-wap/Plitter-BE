@@ -44,18 +44,18 @@ public class CharacterEditSpecGenerator {
                     - Add one or two compact accessories attached to the character.
                     - Add two or three tiny mood marks around the character (each shorter than one star tip length).
                     Rendering style rules:
-                    - Style reference: a quick ballpoint pen doodle scribbled in a notebook margin.
-                    - Draw as if sketched quickly and carelessly by hand.
-                    - Lines must be thin, slightly wobbly, and uneven throughout.
-                    - Vary stroke weight slightly; lines may overshoot at corners or remain open.
-                    - The star silhouette should be slightly imperfect and asymmetric, not geometrically precise.
-                    - The drawing should feel spontaneous and unfinished, not clean or polished.
-                    - Every single line in the image (body, accessories, details) must use the same thin ballpoint-style stroke.
-                    - No part of the image may use thick brush, marker, charcoal, or crayon-like strokes.
+                    - Draw with a fine-tip felt pen or thin ink pen, using clean and sharp lightweight strokes.
+                    - Keep line thickness consistently thin and sharp, with no texture inside each stroke.
+                    - Do not use pencil, crayon, charcoal, chalk, marker, brush, or any soft/fuzzy/textured stroke style.
+                    - Slight wobble in line direction is allowed, but keep stroke thickness thin and consistent.
+                    - Keep the star silhouette slightly imperfect and asymmetric, not geometrically precise.
+                    - Keep the overall drawing like a quick pen doodle: light and fast, not heavy or labored.
+                    - Every line in body, accessories, and details must follow the same thin ink stroke style.
                     - Never use solid flat fill.
-                    - If darkening a small accessory area, use quick rough hatching lines as fast overlapping pen strokes.
+                    - If darkening a small accessory area, use only a few quick overlapping thin ink hatching lines.
+                    - Never use shaded texture or dense fill patterns.
                     - No smooth shading, no gradients, and no 3D rendering.
-                    - Monochrome only: thin dark pencil or ballpoint pen lines on plain white background.
+                    - Monochrome only: thin dark ink lines on plain white background.
                     Style direction:
                     %s
                     Important:
