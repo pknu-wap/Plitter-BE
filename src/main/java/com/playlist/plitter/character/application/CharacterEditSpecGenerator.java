@@ -42,15 +42,15 @@ public class CharacterEditSpecGenerator {
                     - Add one or two compact accessories attached to the character.
                     - Add two or three tiny mood marks around the character (each shorter than one star tip length).
                     Rendering style rules:
-                    - Keep rough hand-drawn doodle line-art look from the input.
-                    - Do not fill the character body with solid colors.
-                    - Do not fill the background with colors.
-                    - Use mostly black or dark gray stroke lines.
-                    - Do not use accent colors; keep all edits monochrome line-art (black/gray only).
-                    - Keep stroke thickness and texture consistent with input.
-                    - Avoid gradients, painterly shading, or 3D rendering.
-                    - Avoid heavy cross-hatching or dense texture rendering.
-                    - Keep background plain and unchanged.
+                    - Style reference: a quick ballpoint pen doodle scribbled in a notebook margin.
+                    - Draw as if sketched quickly and carelessly by hand.
+                    - Lines must be thin, slightly wobbly, and uneven throughout.
+                    - Vary stroke weight slightly; lines may overshoot at corners or remain open.
+                    - The star silhouette should be slightly imperfect and asymmetric, not geometrically precise.
+                    - The drawing should feel spontaneous and unfinished, not clean or polished.
+                    - No solid fills, no shading, no gradients, no 3D rendering.
+                    - Monochrome only: thin dark pencil or ballpoint pen lines on plain white background.
+                    - Do not use marker, brush, charcoal, or any thick/textured stroke style.
                     Style direction:
                     %s
                     Important:

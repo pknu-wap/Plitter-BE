@@ -46,6 +46,8 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
                     "Only apply style-level variations (expression, outfit details, accessories, compact visual marks). " +
                     "Preserve the exact drawing style of input image, including line weight, stroke texture, and rendering style. " +
                     "Keep a rough hand-drawn doodle line-art look. " +
+                    "Style target is a quick notebook ballpoint doodle, slightly unfinished and spontaneous. " +
+                    "Allow slight wobble, minor asymmetry, and imperfect/open line ends. " +
                     "Do not fill the character body with solid colors. " +
                     "Do not fill the background with colors. " +
                     "Do not apply any color fills to character parts or accessories. " +
