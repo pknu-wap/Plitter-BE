@@ -17,6 +17,9 @@ class CharacterEditSpecGeneratorTest {
                   "avgBpm": 130.2,
                   "avgEnergy": 0.78,
                   "avgValence": 0.72,
+                  "bpmCount": 10,
+                  "energyCount": 10,
+                  "valenceCount": 10,
                   "primaryGenre": "dance"
                 }
                 """;
@@ -34,6 +37,9 @@ class CharacterEditSpecGeneratorTest {
                   "avgBpm": 95.0,
                   "avgEnergy": 0.34,
                   "avgValence": 0.20,
+                  "bpmCount": 10,
+                  "energyCount": 10,
+                  "valenceCount": 10,
                   "primaryGenre": "ballad"
                 }
                 """;
