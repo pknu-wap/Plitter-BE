@@ -40,6 +40,7 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
     private static final String SHAPE_PRESERVATION_RULES =
             "Strict character constraints: keep the same base character identity and silhouette family. " +
                     "Preserve the rough hand-drawn line quality and naive doodle character feel from the input image. " +
+                    "Themed variation with new pose and one small prop/accessory is allowed, as long as the same star mascot family identity is preserved. " +
                     "Do not redesign into another species, object, or cleaned vector style. " +
                     "Themed variation is allowed, but props must stay secondary and must not hide the face or replace the star silhouette. " +
                     "Keep exactly one full-body character.";

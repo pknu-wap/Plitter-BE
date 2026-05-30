@@ -29,8 +29,8 @@ public class CharacterEditSpecGenerator {
             String promptText = String.format(
                     """
                     Create a themed doodle variation based on the input star mascot.
-                    The result should look like the same doodle star character family, but it may have a new music-inspired pose, expression, or small prop.
-                    Preserve the character identity, not the exact original pose.
+                    The result should clearly feel like an applied variation from the same doodle star character family.
+                    Preserve the character identity, not the exact original pose or exact limb placement.
                     Music mood:
                     - Genre inspiration: %s
                     - Style tone: %s
@@ -44,13 +44,13 @@ public class CharacterEditSpecGenerator {
                     - simple full-body composition
                     Allowed themed variation:
                     - Change the facial expression to match the mood.
-                    - Slightly adjust arm position only if needed to hold or point toward a small prop.
-                    - Add one small music-themed prop or accessory inspired by the genre.
+                    - Adjust arm and leg pose to create a clear music-themed situation.
+                    - Add one music-themed prop or one accessory inspired by the genre.
                     - Add up to three tiny mood marks, music notes, sparkles, or motion marks around the character.
                     Prop and accessory limits:
                     - Use only one main prop or accessory.
                     - The prop must be visually secondary to the star character.
-                    - The prop must be no larger than one third of the star body.
+                    - The prop must be no larger than one half of the star body.
                     - Accessories attached to the body must be smaller than the face area.
                     - Do not cover the face.
                     - Do not hide or replace the star silhouette.
@@ -69,7 +69,7 @@ public class CharacterEditSpecGenerator {
                     Priority order:
                     1. Keep it recognizable as the same doodle star mascot family.
                     2. Keep the rough naive doodle style.
-                    3. Apply the music-inspired themed variation.
+                    3. Apply a clearly visible music-inspired themed variation (pose + prop/accessory + expression).
                     4. Keep props and accessories simple and secondary.
                     """,
                     genreHint,
@@ -109,13 +109,13 @@ public class CharacterEditSpecGenerator {
     private String createStyleDirection(String styleTone, String genreHint) {
         return switch (styleTone) {
             case "energetic-bright" ->
-                    "Use a cheerful open expression. Add up to three tiny music notes, sparkle marks, or bounce marks. Optionally add one small microphone or tiny cap, kept secondary.";
+                    "Use a cheerful open expression. Create an active upbeat pose. Add tiny music notes, sparkle marks, or bounce marks. Use one prop/accessory such as a tiny microphone or cap, kept secondary.";
             case "energetic-intense" ->
-                    "Use focused eyes with slightly lowered brows inspired by " + genreHint + ". Add up to three short motion marks. Optionally add tiny sunglasses, a small microphone, or a small guitar-like doodle prop, kept secondary.";
+                    "Use focused eyes with slightly lowered brows inspired by " + genreHint + ". Create a dynamic intense pose. Add short motion marks. Use one prop/accessory such as tiny sunglasses, a small microphone, or a small guitar-like doodle prop, kept secondary.";
             case "calm-deep" ->
-                    "Use calm half-closed eyes with a tiny relaxed mouth inspired by " + genreHint + ". Add one or two floating music notes. Optionally add tiny headphones or a small saxophone-like doodle prop beside the body, kept secondary.";
+                    "Use calm half-closed eyes with a tiny relaxed mouth inspired by " + genreHint + ". Create a relaxed flowing pose. Add one or two floating music notes. Use one prop/accessory such as tiny headphones, a small saxophone-like doodle prop, or a thin scarf-like line detail, kept secondary.";
             default ->
-                    "Use a relaxed friendly expression inspired by " + genreHint + ". Add one or two subtle music notes or small mood marks. Optionally add one very simple small prop inspired by the genre.";
+                    "Use a relaxed friendly expression inspired by " + genreHint + ". Create a simple playful pose. Add subtle music notes or mood marks. Use one very simple small prop inspired by the genre, kept secondary.";
         };
     }
 }
