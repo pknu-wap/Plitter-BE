@@ -71,6 +71,9 @@ public class CharacterEditSpecGenerator {
 
         if ((hasReliableEnergy && avgEnergy >= HIGH_ENERGY_THRESHOLD)
                 || (hasReliableBpm && avgBpm >= HIGH_BPM_THRESHOLD)) {
+            if (!hasReliableValence) {
+                return "balanced";
+            }
             return avgValence >= HIGH_VALENCE_THRESHOLD ? "energetic-bright" : "energetic-intense";
         }
 
