@@ -28,33 +28,49 @@ public class CharacterEditSpecGenerator {
             String styleDirection = createStyleDirection(styleTone, genreHint);
             String promptText = String.format(
                     """
-                    The base character is a simple hand-drawn doodle star mascot with a five-point star body, thin stick-like arms and legs, tiny hands and feet, and a minimal face.
-                    Edit the existing mascot while preserving its original silhouette, pose, proportions, and line style as closely as possible.
-                    Adjust the character to reflect the given music mood:
+                    Create a themed doodle variation based on the input star mascot.
+                    The result should look like the same doodle star character family, but it may have a new music-inspired pose, expression, or small prop.
+                    Preserve the character identity, not the exact original pose.
+                    Music mood:
                     - Genre inspiration: %s
                     - Style tone: %s
-                    Character preservation rules:
-                    - Keep the exact five-point star silhouette and body proportions from the input image.
-                    - Keep limb count, limb placement, and full-body composition exactly the same as input.
-                    - Keep the exact drawing style of the input image (line weight, stroke texture, and rendering style).
-                    - Keep exactly one character; do not change character type or species.
-                    - Accessories must not cover or obscure any star tip.
-                    - Keep all accessories smaller than one star-tip length.
-                    Allowed edits:
-                    - Modify facial expression only.
-                    - Add one or two compact accessories attached to the character.
-                    - Add two or three tiny mood marks around the character (each shorter than one star tip length).
+                    Preserve the character identity:
+                    - simple five-point star body
+                    - rough naive hand-drawn doodle style
+                    - thin stick-like arms and legs
+                    - tiny simple hands and feet
+                    - minimal cute face
+                    - awkward uneven asymmetry
+                    - simple full-body composition
+                    Allowed themed variation:
+                    - Change the facial expression to match the mood.
+                    - Slightly adjust arm position only if needed to hold or point toward a small prop.
+                    - Add one small music-themed prop or accessory inspired by the genre.
+                    - Add up to three tiny mood marks, music notes, sparkles, or motion marks around the character.
+                    Prop and accessory limits:
+                    - Use only one main prop or accessory.
+                    - The prop must be visually secondary to the star character.
+                    - The prop must be no larger than one third of the star body.
+                    - Accessories attached to the body must be smaller than the face area.
+                    - Do not cover the face.
+                    - Do not hide or replace the star silhouette.
+                    - Do not add complex clothing or a full outfit.
+                    - Do not turn the character into another species, object, or human-like figure.
                     Rendering style rules:
-                    - Line style must remain monochrome thin clean ink: consistent 0.3mm fineliner-like strokes, sharp edges, no fuzzy texture, no opacity variation, and no marker/brush/pencil effect.
-                    - Slight wobble in line direction is allowed, but keep the stroke thin and consistent.
-                    - No gradients, no 3D rendering, and no paper texture.
+                    - Keep it as a rough black-and-white doodle.
+                    - Use thin, wobbly, uneven black lines similar to the input image.
+                    - Do not polish, smooth, vectorize, thicken, or professionalize the line art.
+                    - Preserve small irregularities and naive hand-drawn imperfections.
+                    - No color, no shading, no gradients, no 3D rendering, and no paper texture.
                     - Transparent background.
-                    - Avoid solid filled areas. If an accessory needs interior detail, use sparse simple line hatching only.
+                    - Avoid solid filled areas; use sparse simple hatching only if necessary.
                     Style direction:
                     %s
-                    Important:
-                    - Use the genre only as a light visual inspiration, not as a reason to redesign the character.
-                    - If any style request conflicts with preserving the base character shape, preserving the base character shape always wins.
+                    Priority order:
+                    1. Keep it recognizable as the same doodle star mascot family.
+                    2. Keep the rough naive doodle style.
+                    3. Apply the music-inspired themed variation.
+                    4. Keep props and accessories simple and secondary.
                     """,
                     genreHint,
                     styleTone,
@@ -93,13 +109,13 @@ public class CharacterEditSpecGenerator {
     private String createStyleDirection(String styleTone, String genreHint) {
         return switch (styleTone) {
             case "energetic-bright" ->
-                    "Use a bright lively expression with one small sporty accessory near the upper area, attached lightly without covering any star tip, and up to three tiny upbeat marks.";
+                    "Use a cheerful open expression. Add up to three tiny music notes, sparkle marks, or bounce marks. Optionally add one small microphone or tiny cap, kept secondary.";
             case "energetic-intense" ->
-                    "Use a focused intense expression inspired by " + genreHint + ", choose one compact accessory that fits the mood, and add at most three short sharp motion lines.";
+                    "Use focused eyes with slightly lowered brows inspired by " + genreHint + ". Add up to three short motion marks. Optionally add tiny sunglasses, a small microphone, or a small guitar-like doodle prop, kept secondary.";
             case "calm-deep" ->
-                    "Use a calm introspective expression inspired by " + genreHint + ", choose one small accessory that fits the mood, and add up to two soft floating marks.";
+                    "Use calm half-closed eyes with a tiny relaxed mouth inspired by " + genreHint + ". Add one or two floating music notes. Optionally add tiny headphones or a small saxophone-like doodle prop beside the body, kept secondary.";
             default ->
-                    "Use a relaxed natural expression inspired by " + genreHint + ", optionally add one tiny accessory, and add up to two subtle mood marks.";
+                    "Use a relaxed friendly expression inspired by " + genreHint + ". Add one or two subtle music notes or small mood marks. Optionally add one very simple small prop inspired by the genre.";
         };
     }
 }

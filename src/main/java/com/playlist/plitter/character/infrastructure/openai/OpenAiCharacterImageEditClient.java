@@ -38,26 +38,11 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
     private static final String IMAGE_EDIT_PATH = "/v1/images/edits";
     private static final String DEFAULT_IMAGE_MEDIA_TYPE = "image/png";
     private static final String SHAPE_PRESERVATION_RULES =
-            "Strict character constraints: keep the same base character identity and silhouette. " +
-                    "Modify the provided character only; do not regenerate a different character from scratch. " +
-                    "Keep the same body framework, limb count, limb placement, and overall proportions. " +
-                    "Keep the star outline fully readable and do not occlude major silhouette points with large accessories. " +
-                    "Accessories must not cover any star tip and must stay smaller than one star-tip length. " +
-                    "Do not redesign into a different species, humanoid body, or new character archetype. " +
-                    "Only apply style-level variations (expression, outfit details, accessories, compact visual marks). " +
-                    "Preserve the exact drawing style of input image, including line weight, stroke texture, and rendering style. " +
-                    "Keep a rough hand-drawn doodle line-art look. " +
-                    "Style target is a quick notebook ballpoint doodle, slightly unfinished and spontaneous. " +
-                    "Allow slight wobble, minor asymmetry, and imperfect/open line ends. " +
-                    "Do not fill the character body with solid colors. " +
-                    "Do not fill the background with colors. " +
-                    "Do not apply any color fills to character parts or accessories. " +
-                    "Never use solid flat fill on accessories; if darkening is needed, use quick rough pen hatching only. " +
-                    "Keep output strictly monochrome with black or dark-gray lines only. " +
-                    "Prefer black or dark-gray thin stroke lines, minimal shading, and a plain background. " +
-                    "Every line (body/accessories/details) must keep the same thin ballpoint-like stroke style; avoid thick marker/brush/charcoal/crayon texture. " +
-                    "Avoid heavy dense hatching or polished rendering. " +
-                    "Output exactly one full-body character.";
+            "Strict character constraints: keep the same base character identity and silhouette family. " +
+                    "Preserve the rough hand-drawn line quality and naive doodle character feel from the input image. " +
+                    "Do not redesign into another species, object, or cleaned vector style. " +
+                    "Themed variation is allowed, but props must stay secondary and must not hide the face or replace the star silhouette. " +
+                    "Keep exactly one full-body character.";
 
     private final String openAiApiKey;
     private final String openAiModel;
