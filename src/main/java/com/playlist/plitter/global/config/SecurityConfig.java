@@ -49,6 +49,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/guest").permitAll()
                         .requestMatchers("/auth/logout").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/playlists/*/public").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/playlists/recommendations/*/public").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/playlists/*/recommendations").permitAll()
                         .requestMatchers("/api/tracks/search").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()

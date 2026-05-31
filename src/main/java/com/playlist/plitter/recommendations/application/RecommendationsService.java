@@ -136,4 +136,9 @@ public class RecommendationsService {
 
         return RecommendationDetailResponse.from(recommendation, comments);
     }
+
+    @Transactional(readOnly = true)
+    public RecommendationDetailResponse getRecommendationPublicDetail(Long recommendationId) {
+        return getRecommendationDetail(recommendationId);
+    }
 }
