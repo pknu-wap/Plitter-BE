@@ -34,4 +34,12 @@ public class RecommendationsController {
         RecommendationDetailResponse response = recommendationsService.getRecommendationDetail(recommendationId);
         return ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, response);
     }
+
+    @GetMapping("/recommendations/{recommendationId}/public")
+    public ResponseDto<RecommendationDetailResponse> getRecommendationPublicDetail(
+            @PathVariable Long recommendationId
+    ) {
+        RecommendationDetailResponse response = recommendationsService.getRecommendationPublicDetail(recommendationId);
+        return ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, response);
+    }
 }
