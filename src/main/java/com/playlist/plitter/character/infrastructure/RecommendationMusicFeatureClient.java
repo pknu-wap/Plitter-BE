@@ -110,6 +110,9 @@ public class RecommendationMusicFeatureClient implements MusicFeatureClient {
         payload.put("analyzedTrackCount", analyzedTrackCount);
         payload.put("avgEnergy", average(summary.energySum, summary.energyCount));
         payload.put("avgValence", average(summary.valenceSum, summary.valenceCount));
+        payload.put("energyCount", summary.energyCount);
+        payload.put("valenceCount", summary.valenceCount);
+        payload.put("genreCount", summary.genreCounts.values().stream().mapToInt(Integer::intValue).sum());
         payload.put("primaryGenre", findPrimaryGenre(summary.genreCounts));
         payload.put("genreDistribution", summary.genreCounts);
 

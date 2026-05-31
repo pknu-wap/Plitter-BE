@@ -11,9 +11,10 @@ import org.springframework.stereotype.Component;
 public class CharacterEditSpecGenerator {
 
     private static final double HIGH_ENERGY_THRESHOLD = 0.65;
-    private static final double LOW_ENERGY_THRESHOLD = 0.45;
+    private static final double MID_ENERGY_THRESHOLD = 0.50;
     private static final double HIGH_VALENCE_THRESHOLD = 0.60;
     private static final double LOW_VALENCE_THRESHOLD = 0.40;
+    private static final int MIN_CONFIDENT_FEATURE_COUNT = 2;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -22,9 +23,11 @@ public class CharacterEditSpecGenerator {
             JsonNode root = objectMapper.readTree(featureSummaryJson);
             double avgEnergy = root.path("avgEnergy").asDouble(0.0);
             double avgValence = root.path("avgValence").asDouble(0.0);
+            int energyCount = root.path("energyCount").asInt(0);
+            int valenceCount = root.path("valenceCount").asInt(0);
             String genreHint = toGenreHint(root.path("primaryGenre").asText("balanced"));
 
-            String styleTone = createStyleTone(avgEnergy, avgValence);
+            String styleTone = createStyleTone(avgEnergy, avgValence, energyCount, valenceCount);
             String styleDirection = createStyleDirection(styleTone, genreHint);
             String promptText = String.format(
                     """
@@ -82,13 +85,28 @@ public class CharacterEditSpecGenerator {
         }
     }
 
-    private String createStyleTone(double avgEnergy, double avgValence) {
-        if (avgEnergy >= HIGH_ENERGY_THRESHOLD) {
+    private String createStyleTone(double avgEnergy, double avgValence, int energyCount, int valenceCount) {
+        boolean hasReliableEnergy = energyCount >= MIN_CONFIDENT_FEATURE_COUNT;
+        boolean hasReliableValence = valenceCount >= MIN_CONFIDENT_FEATURE_COUNT;
+
+        if (!hasReliableEnergy && !hasReliableValence) {
+            return "balanced";
+        }
+
+        if (hasReliableEnergy && avgEnergy >= HIGH_ENERGY_THRESHOLD) {
+            if (!hasReliableValence) {
+                return "balanced";
+            }
             return avgValence >= HIGH_VALENCE_THRESHOLD ? "energetic-bright" : "energetic-intense";
         }
-        if (avgEnergy <= LOW_ENERGY_THRESHOLD && avgValence <= LOW_VALENCE_THRESHOLD) {
+
+        if (hasReliableValence && avgValence <= LOW_VALENCE_THRESHOLD) {
+            if (hasReliableEnergy && avgEnergy >= MID_ENERGY_THRESHOLD) {
+                return "balanced";
+            }
             return "calm-deep";
         }
+
         return "balanced";
     }
 
