@@ -18,6 +18,7 @@ import com.playlist.plitter.character.presentation.dto.response.CharacterDownloa
 import com.playlist.plitter.global.exception.ApiException;
 import com.playlist.plitter.playlist.domain.entity.PlaylistEntity;
 import com.playlist.plitter.playlist.domain.repository.PlaylistRepository;
+import com.playlist.plitter.recommendations.domain.repository.RecommendationsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -46,14 +47,15 @@ public class CharacterService {
     private final CharacterImageEditClient characterImageEditClient;
     private final ImageStorageClient imageStorageClient;
     private final PlatformTransactionManager transactionManager;
+    private final RecommendationsRepository recommendationsRepository;
 
     public CharacterAvailabilityResponse getAvailability(Long playlistId, Long requesterUserId) {
         PlaylistEntity playlist = getOwnedPlaylistOrThrow(playlistId, requesterUserId);
-        int currentCount = playlist.getRecommendationCount();
+        int currentCount = getActualRecommendationCount(playlist);
         int missingCount = Math.max(REQUIRED_RECOMMENDATION_COUNT - currentCount, 0);
 
         return new CharacterAvailabilityResponse(
-                isCreatable(playlist),
+                isCreatable(currentCount),
                 REQUIRED_RECOMMENDATION_COUNT,
                 currentCount,
                 missingCount
@@ -63,7 +65,8 @@ public class CharacterService {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public CharacterCreateResponse createCharacter(Long playlistId, Long requesterUserId) {
         PlaylistEntity playlist = getOwnedPlaylistOrThrow(playlistId, requesterUserId);
-        if (!isCreatable(playlist)) {
+        int currentCount = getActualRecommendationCount(playlist);
+        if (!isCreatable(currentCount)) {
             throw new ApiException(CharacterErrorCode.CHARACTER_NOT_AVAILABLE);
         }
 
@@ -123,8 +126,12 @@ public class CharacterService {
                 .orElseThrow(() -> new ApiException(CharacterErrorCode.CHARACTER_NOT_FOUND));
     }
 
-    private boolean isCreatable(PlaylistEntity playlist) {
-        return playlist.getRecommendationCount() >= REQUIRED_RECOMMENDATION_COUNT;
+    private int getActualRecommendationCount(PlaylistEntity playlist) {
+        return (int) recommendationsRepository.countByPlaylist(playlist);
+    }
+
+    private boolean isCreatable(int recommendationCount) {
+        return recommendationCount >= REQUIRED_RECOMMENDATION_COUNT;
     }
 
     private String collectFeatureSummary(Long playlistId) {
