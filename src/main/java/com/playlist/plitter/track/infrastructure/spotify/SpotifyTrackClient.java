@@ -18,10 +18,14 @@ import se.michaelthelin.spotify.requests.data.search.SearchItemRequest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 public class SpotifyTrackClient {
+    private static final int SPOTIFY_SEARCH_MIN_LIMIT = 1;
+    private static final int SPOTIFY_SEARCH_MAX_LIMIT = 10;
+    private static final int SPOTIFY_SEARCH_DEFAULT_LIMIT = 5;
 
     @Value("${spotify.client-id}")
     private String clientId;
@@ -32,13 +36,16 @@ public class SpotifyTrackClient {
     public List<TrackSearchResponse> searchTracks(String keyword, Integer limit) {
         try {
             SpotifyApi spotifyApi = createSpotifyApi();
+            int normalizedLimit = normalizeLimit(limit);
 
             SearchItemRequest searchItemRequest = spotifyApi.searchItem(keyword, ModelObjectType.TRACK.getType())
-                    .limit(limit)
+                    .limit(normalizedLimit)
                     .build();
 
             SearchResult searchResult = searchItemRequest.execute();
-            Track[] tracks = searchResult.getTracks().getItems();
+            Track[] tracks = (searchResult != null && searchResult.getTracks() != null && searchResult.getTracks().getItems() != null)
+                    ? searchResult.getTracks().getItems()
+                    : new Track[0];
 
             List<TrackSearchResponse> result = new ArrayList<>();
 
@@ -48,12 +55,16 @@ public class SpotifyTrackClient {
                         : "";
 
                 String albumImageUrl = "";
-                Image[] images = track.getAlbum().getImages();
+                Image[] images = (track.getAlbum() != null) ? track.getAlbum().getImages() : null;
                 if (images != null && images.length > 0) {
                     albumImageUrl = images[0].getUrl();
                 }
 
-                String spotifyUrl = track.getExternalUrls().getExternalUrls().get("spotify");
+                String spotifyUrl = "";
+                if (track.getExternalUrls() != null) {
+                    Map<String, String> externalUrls = track.getExternalUrls().getExternalUrls();
+                    spotifyUrl = externalUrls != null ? externalUrls.getOrDefault("spotify", "") : "";
+                }
 
                 result.add(new TrackSearchResponse(
                         track.getId(),
@@ -71,6 +82,16 @@ public class SpotifyTrackClient {
         } catch (Exception e) {
             throw new ApiException(TrackErrorCode.TRACK_SEARCH_FAILED);
         }
+    }
+
+    private int normalizeLimit(Integer limit) {
+        if (limit == null) {
+            return SPOTIFY_SEARCH_DEFAULT_LIMIT;
+        }
+        if (limit < SPOTIFY_SEARCH_MIN_LIMIT) {
+            return SPOTIFY_SEARCH_MIN_LIMIT;
+        }
+        return Math.min(limit, SPOTIFY_SEARCH_MAX_LIMIT);
     }
 
     private SpotifyApi createSpotifyApi() throws Exception {
