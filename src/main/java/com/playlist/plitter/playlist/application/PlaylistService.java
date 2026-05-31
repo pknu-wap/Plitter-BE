@@ -1,29 +1,25 @@
 package com.playlist.plitter.playlist.application;
 
+import com.playlist.plitter.auth.domain.entity.UserEntity;
+import com.playlist.plitter.auth.domain.repository.UserRepository;
+import com.playlist.plitter.auth.exception.AuthErrorCode;
 import com.playlist.plitter.playlist.application.dto.PlaylistCheckResponse;
 import com.playlist.plitter.playlist.application.dto.PlaylistCreateResponse;
+import com.playlist.plitter.playlist.application.dto.PlaylistPublicResponse;
 import com.playlist.plitter.playlist.application.dto.PlaylistResponse;
 import com.playlist.plitter.playlist.domain.entity.PlaylistEntity;
 import com.playlist.plitter.playlist.domain.repository.PlaylistRepository;
-import com.playlist.plitter.auth.domain.entity.UserEntity;
-import com.playlist.plitter.auth.domain.repository.UserRepository;
 import com.playlist.plitter.global.exception.ApiException;
-import com.playlist.plitter.playlist.exception.PlaylistErrorCode;
 import com.playlist.plitter.recommendations.application.dto.RecommendationResponse;
+import com.playlist.plitter.recommendations.domain.entity.RecommendationsEntity;
 import com.playlist.plitter.recommendations.domain.repository.RecommendationsRepository;
 import com.playlist.plitter.track.domain.entity.TrackEntity;
+import com.playlist.plitter.playlist.exception.PlaylistErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
-import com.playlist.plitter.auth.exception.AuthErrorCode;
-import com.playlist.plitter.global.exception.ApiException;
-import com.playlist.plitter.playlist.exception.PlaylistErrorCode;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.Optional;
 import java.util.UUID;
 
@@ -100,6 +96,26 @@ public class PlaylistService {
         }
 
         return new PlaylistCheckResponse(false, null);
+    }
+
+    @Transactional(readOnly = true)
+    public PlaylistPublicResponse getPlaylistPublic(Long playlistId) {
+        PlaylistEntity playlist = playlistRepository.findById(playlistId)
+                .orElseThrow(() -> new ApiException(PlaylistErrorCode.PLAYLIST_NOT_FOUND));
+
+        String latestCoverImageUrl = recommendationsRepository.findTopByPlaylistOrderByCreatedAtDescIdDesc(playlist)
+                .map(RecommendationsEntity::getTrack)
+                .map(TrackEntity::getAlbumCoverUrl)
+                .orElse(null);
+
+        int recommendationCount = playlist.getRecommendationCount();
+        return new PlaylistPublicResponse(
+                playlist.getId(),
+                playlist.getShortId(),
+                recommendationCount,
+                recommendationCount >= 10,
+                latestCoverImageUrl
+        );
     }
 
 }

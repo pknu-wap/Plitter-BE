@@ -5,6 +5,7 @@ import com.playlist.plitter.global.dto.SuccessMessage;
 import com.playlist.plitter.playlist.application.PlaylistService;
 import com.playlist.plitter.playlist.application.dto.PlaylistCheckResponse;
 import com.playlist.plitter.playlist.application.dto.PlaylistCreateResponse;
+import com.playlist.plitter.playlist.application.dto.PlaylistPublicResponse;
 import com.playlist.plitter.playlist.application.dto.PlaylistResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -42,6 +43,14 @@ public class PlaylistController {
             @PathVariable Long playlistId
     ) {
         PlaylistResponse response = playlistService.getPlaylist(playlistId);
+        return ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, response);
+    }
+
+    @GetMapping("/playlists/{playlistId}/public")
+    public ResponseDto<PlaylistPublicResponse> getPlaylistPublic(
+            @PathVariable Long playlistId
+    ) {
+        PlaylistPublicResponse response = playlistService.getPlaylistPublic(playlistId);
         return ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, response);
     }
 
