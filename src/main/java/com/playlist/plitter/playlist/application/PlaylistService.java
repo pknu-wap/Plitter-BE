@@ -19,9 +19,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -111,16 +114,23 @@ public class PlaylistService {
     }
 
     private List<RecommendationResponse> toRecommendationResponses(PlaylistEntity playlist) {
-        return recommendationsRepository.findAllByPlaylist(playlist)
+        List<RecommendationsEntity> recommendations = recommendationsRepository.findAllByPlaylist(playlist);
+        Map<String, Long> commentCountBySpotifyId = recommendations.stream()
+                .map(recommendation -> recommendation.getTrack().getSpotifyTrackId())
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        return recommendations
                 .stream()
                 .map(recommendation -> {
                     TrackEntity track = recommendation.getTrack();
                     return new RecommendationResponse(
+                            recommendation.getId(),
                             track.getSpotifyTrackId(),
                             track.getTitle(),
                             track.getArtistName(),
                             track.getAlbumCoverUrl(),
-                            track.getPreviewUrl()
+                            track.getPreviewUrl(),
+                            commentCountBySpotifyId.getOrDefault(track.getSpotifyTrackId(), 0L).intValue()
                     );
                 })
                 .toList();
