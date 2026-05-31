@@ -18,6 +18,7 @@ import se.michaelthelin.spotify.requests.data.search.SearchItemRequest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -42,7 +43,9 @@ public class SpotifyTrackClient {
                     .build();
 
             SearchResult searchResult = searchItemRequest.execute();
-            Track[] tracks = searchResult.getTracks().getItems();
+            Track[] tracks = (searchResult != null && searchResult.getTracks() != null && searchResult.getTracks().getItems() != null)
+                    ? searchResult.getTracks().getItems()
+                    : new Track[0];
 
             List<TrackSearchResponse> result = new ArrayList<>();
 
@@ -52,12 +55,16 @@ public class SpotifyTrackClient {
                         : "";
 
                 String albumImageUrl = "";
-                Image[] images = track.getAlbum().getImages();
+                Image[] images = (track.getAlbum() != null) ? track.getAlbum().getImages() : null;
                 if (images != null && images.length > 0) {
                     albumImageUrl = images[0].getUrl();
                 }
 
-                String spotifyUrl = track.getExternalUrls().getExternalUrls().get("spotify");
+                String spotifyUrl = "";
+                if (track.getExternalUrls() != null) {
+                    Map<String, String> externalUrls = track.getExternalUrls().getExternalUrls();
+                    spotifyUrl = externalUrls != null ? externalUrls.getOrDefault("spotify", "") : "";
+                }
 
                 result.add(new TrackSearchResponse(
                         track.getId(),
