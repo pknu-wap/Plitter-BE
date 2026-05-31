@@ -64,11 +64,12 @@ public class PlaylistService {
                 .orElseThrow(() -> new ApiException(PlaylistErrorCode.PLAYLIST_NOT_FOUND));
 
         List<RecommendationResponse> recommendations = toRecommendationResponses(playlist);
+        int recommendationCount = recommendations.size();
 
         return new PlaylistResponse(
                 playlist.getId(),
-                playlist.getRecommendationCount(),
-                playlist.getRecommendationCount() >= 10,
+                recommendationCount,
+                recommendationCount >= 10,
                 recommendations
         );
     }
@@ -97,7 +98,7 @@ public class PlaylistService {
                 .map(TrackEntity::getAlbumCoverUrl)
                 .orElse(null);
 
-        int recommendationCount = playlist.getRecommendationCount();
+        int recommendationCount = recommendations.size();
         return new PlaylistPublicResponse(
                 playlist.getId(),
                 playlist.getShortId(),
