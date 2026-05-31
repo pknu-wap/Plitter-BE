@@ -34,5 +34,7 @@ public interface RecommendationsRepository extends JpaRepository<Recommendations
             String guestToken
     );
 
+    long countByPlaylist(PlaylistEntity playlist);
+
     Optional<RecommendationsEntity> findTopByPlaylistOrderByCreatedAtDescIdDesc(PlaylistEntity playlist);
 }
