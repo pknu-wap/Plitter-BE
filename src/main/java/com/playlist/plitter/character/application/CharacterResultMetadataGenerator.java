@@ -12,6 +12,7 @@ import java.util.List;
 public class CharacterResultMetadataGenerator {
 
     private static final double HIGH_ENERGY_THRESHOLD = 0.65;
+    private static final double LOW_ENERGY_THRESHOLD = 0.45;
     private static final double HIGH_VALENCE_THRESHOLD = 0.60;
     private static final double LOW_VALENCE_THRESHOLD = 0.40;
 
@@ -41,7 +42,7 @@ public class CharacterResultMetadataGenerator {
         if (avgEnergy >= HIGH_ENERGY_THRESHOLD) {
             return avgValence >= HIGH_VALENCE_THRESHOLD ? "energetic-bright" : "energetic-intense";
         }
-        if (avgValence <= LOW_VALENCE_THRESHOLD) {
+        if (avgEnergy <= LOW_ENERGY_THRESHOLD && avgValence <= LOW_VALENCE_THRESHOLD) {
             return "calm-deep";
         }
         return "balanced";

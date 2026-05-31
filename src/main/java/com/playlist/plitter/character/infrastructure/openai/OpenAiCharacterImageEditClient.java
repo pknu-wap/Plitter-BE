@@ -24,10 +24,16 @@ import org.springframework.web.client.RestClientResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 @Primary
@@ -38,19 +44,14 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
     private static final String IMAGE_EDIT_PATH = "/v1/images/edits";
     private static final String DEFAULT_IMAGE_MEDIA_TYPE = "image/png";
     private static final String SHAPE_PRESERVATION_RULES =
-            "Strict character constraints: keep the same base character identity and silhouette. " +
-                    "Keep the same body framework, limb count, limb placement, and overall proportions. " +
-                    "Keep the star outline fully readable and do not occlude major silhouette points with large accessories. " +
-                    "Do not redesign into a different species, humanoid body, or new character archetype. " +
-                    "Only apply style-level variations (expression, outfit details, accessories, compact visual marks). " +
-                    "Keep a rough hand-drawn doodle line-art look. " +
-                    "Do not fill the character body with solid colors. " +
-                    "Do not fill the background with colors. " +
-                    "Do not apply any color fills to character parts or accessories. " +
-                    "Keep output strictly monochrome with black or dark-gray lines only. " +
-                    "Prefer black or dark-gray thin stroke lines, minimal shading, and a plain background. " +
-                    "Avoid heavy cross-hatching or dense sketch textures. " +
-                    "Output exactly one full-body character.";
+            "Strict character constraints: keep the same doodle star mascot family and base silhouette logic. " +
+                    "Preserve the rough hand-drawn line quality and naive doodle character feel from the input image. " +
+                    "Create one fresh applied variation, not a polished redraw and not a different species or object. " +
+                    "Props may vary from generation to generation, but they must stay secondary and must not hide the face or replace the star silhouette. " +
+                    "Keep exactly one full-body character.";
+    private static final String REFERENCE_SHEET_GUIDE =
+            "The additional uploaded reference sheet shows the same character family with base, expression, and applied examples. " +
+                    "Use that sheet as style vocabulary only. Create one new applied variation instead of copying any exact example composition.";
 
     private final String openAiApiKey;
     private final String openAiModel;
@@ -93,28 +94,28 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
 
         try {
             SourceImage sourceImage = loadSourceImage(request.baseCharacterImage().imageUrl());
-            byte[] imageBytes = sourceImage.bytes();
-
-            if (imageBytes == null || imageBytes.length == 0) {
+            List<SourceImage> inputImages = prepareInputImages(sourceImage);
+            if (inputImages.isEmpty() || inputImages.get(0).bytes() == null || inputImages.get(0).bytes().length == 0) {
                 log.error("Loaded base image bytes are empty: source={}", request.baseCharacterImage().imageUrl());
                 throw new ApiException(CharacterErrorCode.CHARACTER_GENERATION_FAILED);
             }
 
-            HttpHeaders imageHeaders = new HttpHeaders();
-            imageHeaders.setContentType(sourceImage.mediaType());
-            HttpEntity<ByteArrayResource> imagePart = new HttpEntity<>(
-                    new NamedByteArrayResource(imageBytes, sourceImage.filename()),
-                    imageHeaders
-            );
-
             MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
             formData.add("model", openAiModel);
-            formData.add("prompt", buildPrompt(request.editSpec().promptText()));
+            formData.add("prompt", buildPrompt(request.editSpec().promptText(), inputImages.size() > 1));
             formData.add("size", openAiSize);
             formData.add("quality", openAiQuality);
             formData.add("n", "1");
-            formData.add("image[]", imagePart);
             formData.add("output_format", "png");
+            for (SourceImage inputImage : inputImages) {
+                HttpHeaders imageHeaders = new HttpHeaders();
+                imageHeaders.setContentType(inputImage.mediaType());
+                HttpEntity<ByteArrayResource> imagePart = new HttpEntity<>(
+                        new NamedByteArrayResource(inputImage.bytes(), inputImage.filename()),
+                        imageHeaders
+                );
+                formData.add("image[]", imagePart);
+            }
 
             ImageEditResponse response = openAiRestClient.post()
                     .uri(IMAGE_EDIT_PATH)
@@ -162,8 +163,11 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
         return requestFactory;
     }
 
-    private String buildPrompt(String promptText) {
-        return SHAPE_PRESERVATION_RULES + " " + promptText;
+    private String buildPrompt(String promptText, boolean hasReferenceSheet) {
+        if (!hasReferenceSheet) {
+            return SHAPE_PRESERVATION_RULES + " " + promptText;
+        }
+        return SHAPE_PRESERVATION_RULES + " " + REFERENCE_SHEET_GUIDE + " " + promptText;
     }
 
     private MediaType resolveImageMediaType(MediaType sourceMediaType) {
@@ -193,6 +197,22 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
         return new SourceImage(body, mediaType, filename);
     }
 
+    private List<SourceImage> prepareInputImages(SourceImage sourceImage) throws Exception {
+        if (!looksLikeReferenceSheet(sourceImage)) {
+            return List.of(sourceImage);
+        }
+
+        SourceImage primaryBaseImage = extractPrimaryBaseCharacter(sourceImage);
+        List<SourceImage> inputImages = new ArrayList<>();
+        inputImages.add(primaryBaseImage);
+        inputImages.add(new SourceImage(
+                sourceImage.bytes(),
+                sourceImage.mediaType(),
+                appendFilenameSuffix(sourceImage.filename(), "-reference")
+        ));
+        return inputImages;
+    }
+
     private SourceImage fromClasspath(String classpathLocation) throws Exception {
         String normalizedLocation = classpathLocation.startsWith("/")
                 ? classpathLocation.substring(1)
@@ -209,6 +229,97 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
         MediaType mediaType = resolveImageMediaType(resolveMediaTypeFromPath(path));
         String filename = path.getFileName() != null ? path.getFileName().toString() : "base-character.png";
         return new SourceImage(body, mediaType, filename);
+    }
+
+    private boolean looksLikeReferenceSheet(SourceImage sourceImage) {
+        try {
+            BufferedImage image = ImageIO.read(new ByteArrayInputStream(sourceImage.bytes()));
+            return image != null && image.getWidth() >= image.getHeight() * 2;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private SourceImage extractPrimaryBaseCharacter(SourceImage sourceImage) throws Exception {
+        BufferedImage sheet = ImageIO.read(new ByteArrayInputStream(sourceImage.bytes()));
+        if (sheet == null) {
+            return sourceImage;
+        }
+
+        int width = sheet.getWidth();
+        int height = sheet.getHeight();
+        int scanStartY = Math.max(0, height / 5);
+        int scanEndY = height - 1;
+        int scanEndX = Math.min(width - 1, Math.max(height, width / 4));
+
+        int minX = scanEndX;
+        int minY = scanEndY;
+        int maxX = 0;
+        int maxY = 0;
+
+        for (int y = scanStartY; y <= scanEndY; y++) {
+            for (int x = 0; x <= scanEndX; x++) {
+                if (isInkPixel(sheet.getRGB(x, y))) {
+                    minX = Math.min(minX, x);
+                    minY = Math.min(minY, y);
+                    maxX = Math.max(maxX, x);
+                    maxY = Math.max(maxY, y);
+                }
+            }
+        }
+
+        if (maxX <= minX || maxY <= minY) {
+            return sourceImage;
+        }
+
+        int padding = Math.max(12, height / 20);
+        int cropX = Math.max(0, minX - padding);
+        int cropY = Math.max(0, minY - padding);
+        int cropWidth = Math.min(width - cropX, (maxX - minX) + (padding * 2) + 1);
+        int cropHeight = Math.min(height - cropY, (maxY - minY) + (padding * 2) + 1);
+
+        BufferedImage cropped = new BufferedImage(cropWidth, cropHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = cropped.createGraphics();
+        graphics.drawImage(
+                sheet,
+                0,
+                0,
+                cropWidth,
+                cropHeight,
+                cropX,
+                cropY,
+                cropX + cropWidth,
+                cropY + cropHeight,
+                null
+        );
+        graphics.dispose();
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ImageIO.write(cropped, "png", outputStream);
+        return new SourceImage(
+                outputStream.toByteArray(),
+                MediaType.IMAGE_PNG,
+                appendFilenameSuffix(sourceImage.filename(), "-source")
+        );
+    }
+
+    private boolean isInkPixel(int argb) {
+        int alpha = (argb >> 24) & 0xff;
+        int red = (argb >> 16) & 0xff;
+        int green = (argb >> 8) & 0xff;
+        int blue = argb & 0xff;
+        return alpha > 32 && (red < 245 || green < 245 || blue < 245);
+    }
+
+    private String appendFilenameSuffix(String filename, String suffix) {
+        if (!StringUtils.hasText(filename)) {
+            return "base-character" + suffix + ".png";
+        }
+        int extensionIndex = filename.lastIndexOf('.');
+        if (extensionIndex < 0) {
+            return filename + suffix;
+        }
+        return filename.substring(0, extensionIndex) + suffix + filename.substring(extensionIndex);
     }
 
     private MediaType resolveMediaTypeFromPath(Path path) {

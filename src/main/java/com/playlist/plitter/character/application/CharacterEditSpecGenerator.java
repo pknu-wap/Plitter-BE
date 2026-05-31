@@ -7,6 +7,10 @@ import com.playlist.plitter.character.exception.CharacterErrorCode;
 import com.playlist.plitter.global.exception.ApiException;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Component
 public class CharacterEditSpecGenerator {
 
@@ -15,6 +19,7 @@ public class CharacterEditSpecGenerator {
     private static final double HIGH_VALENCE_THRESHOLD = 0.60;
     private static final double LOW_VALENCE_THRESHOLD = 0.40;
     private static final int MIN_CONFIDENT_FEATURE_COUNT = 2;
+    private static final ConcurrentHashMap<String, AtomicInteger> VARIATION_COUNTER = new ConcurrentHashMap<>();
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -28,54 +33,60 @@ public class CharacterEditSpecGenerator {
             String genreHint = toGenreHint(root.path("primaryGenre").asText("balanced"));
 
             String styleTone = createStyleTone(avgEnergy, avgValence, energyCount, valenceCount);
-            String styleDirection = createStyleDirection(styleTone);
+            String styleDirection = createStyleDirection(styleTone, genreHint);
+            String variationDirective = createVariationDirective(styleTone, genreHint);
             String promptText = String.format(
                     """
-                    The base character is a simple hand-drawn doodle star mascot with a five-point star body, thin stick-like arms and legs, tiny hands and feet, and a minimal face.
-                    Create a variation of this same mascot, not a new character.
-                    Edit the character to reflect the given music mood:
+                    Create a themed doodle variation based on the input star mascot.
+                    The result should clearly feel like one new applied variation from the same doodle star character family.
+                    Preserve the character identity, not the exact original pose or exact limb placement.
+                    Music mood:
                     - Genre inspiration: %s
                     - Style tone: %s
-                    - avgEnergy: %.2f
-                    - avgValence: %.2f
-                    Character preservation rules:
-                    - Preserve the same recognizable five-point star body silhouette.
-                    - Preserve the thin stick-like arms and legs.
-                    - Preserve the tiny simple hands and feet.
-                    - Preserve the simple doodle mascot identity.
-                    - Preserve the same full-body composition.
-                    - Preserve the same limb count, limb placement, and body proportions.
-                    - Keep the star outline fully readable; do not hide major star tips with large accessories.
-                    - Accessories must not change the main star outline except for tiny attached details.
-                    - Do not turn the character into a human, animal, monster, robot, or different creature.
-                    - Do not add extra characters. Generate exactly one full-body character.
-                    - Do not make the background the main change.
-                    Allowed edits:
-                    - Change the facial expression.
-                    - Add small outfit details.
-                    - Add compact accessories.
-                    - Add subtle music-inspired visual details directly on or around the character.
+                    Preserve the character identity:
+                    - simple five-point star body
+                    - rough naive hand-drawn doodle style
+                    - thin stick-like arms and legs
+                    - tiny simple hands and feet
+                    - minimal cute face
+                    - awkward uneven asymmetry
+                    - simple full-body composition
+                    Allowed themed variation:
+                    - Change the facial expression to match the mood.
+                    - Adjust arm and leg pose to create a clear music-themed situation.
+                    - Add one music-themed prop or one accessory inspired by the genre.
+                    - Add up to three tiny mood marks, music notes, sparkles, or motion marks around the character.
+                    Prop and accessory limits:
+                    - Use only one main prop or accessory.
+                    - The prop must be visually secondary to the star character.
+                    - The prop must be no larger than one half of the star body.
+                    - Accessories attached to the body must be smaller than the face area.
+                    - Do not cover the face.
+                    - Do not hide or replace the star silhouette.
+                    - Do not add complex clothing or a full outfit.
+                    - Do not turn the character into another species, object, or human-like figure.
                     Rendering style rules:
-                    - Keep a rough hand-drawn doodle line-art look.
-                    - Do not fill the character body with solid colors.
-                    - Do not fill the background with colors.
-                    - Use mostly black or dark gray stroke lines.
-                    - Do not use accent colors; keep all edits monochrome line-art (black/gray only).
-                    - Keep stroke thickness simple and fairly thin.
-                    - Avoid gradients, painterly shading, or 3D rendering.
-                    - Avoid heavy cross-hatching or dense texture rendering.
-                    - Keep the background plain and simple.
+                    - Keep it as a rough black-and-white doodle.
+                    - Use thin, wobbly, uneven black lines similar to the input image.
+                    - Do not polish, smooth, vectorize, thicken, or professionalize the line art.
+                    - Preserve small irregularities and naive hand-drawn imperfections.
+                    - No color, no shading, no gradients, no 3D rendering, and no paper texture.
+                    - Transparent background.
+                    - Avoid solid filled areas; use sparse simple hatching only if necessary.
                     Style direction:
                     %s
-                    Important:
-                    - Use the genre only as a light visual inspiration, not as a reason to redesign the character.
-                    - If any style request conflicts with preserving the base character shape, preserving the base character shape always wins.
+                    Variation directive for this generation:
+                    %s
+                    Priority order:
+                    1. Keep it recognizable as the same doodle star mascot family.
+                    2. Keep the rough naive doodle style.
+                    3. Apply a clearly visible music-inspired themed variation (pose + prop/accessory + expression).
+                    4. Keep props and accessories simple and secondary.
                     """,
                     genreHint,
                     styleTone,
-                    avgEnergy,
-                    avgValence,
-                    styleDirection
+                    styleDirection,
+                    variationDirective
             );
             return new CharacterEditSpec(promptText, styleTone);
         } catch (Exception e) {
@@ -122,16 +133,52 @@ public class CharacterEditSpecGenerator {
         };
     }
 
-    private String createStyleDirection(String styleTone) {
+    private String createStyleDirection(String styleTone, String genreHint) {
         return switch (styleTone) {
             case "energetic-bright" ->
-                    "Use a cheerful confident expression, upbeat motion lines, tiny sparkle marks, light sporty details, or small playful accessories. Keep all additions compact and doodle-like.";
+                    "Push toward playful, bright, celebratory energy inspired by " + genreHint + ". " +
+                            "Let the pose feel lively and extroverted. Choose expression, prop, and tiny mood marks freely within the doodle family.";
             case "energetic-intense" ->
-                    "Use an intense focused expression, small sunglasses, a tiny headband, sharp motion lines, or bold but minimal line-art accessories. Do not make the character aggressive or creature-like.";
+                    "Push toward bold, kinetic, high-tension energy inspired by " + genreHint + ". " +
+                            "Let the pose feel driven and assertive. Choose one strong visual hook without falling back to the same repeated accessory formula.";
             case "calm-deep" ->
-                    "Use a calm thoughtful expression, tiny headphones, a small scarf, soft floating lines, or restrained music-note details. Keep the mood quiet and minimal.";
+                    "Push toward quiet, immersed, reflective energy inspired by " + genreHint + ". " +
+                            "Let the pose feel relaxed or flowing. Choose one restrained prop or accessory and keep the mood subtle, spacious, and intimate.";
             default ->
-                    "Use a natural friendly expression, simple everyday accessory details, and balanced doodle styling. Keep the character close to the base design.";
+                    "Push toward casual, friendly, everyday music energy inspired by " + genreHint + ". " +
+                            "Let the pose feel natural and charming. Choose one light prop or accessory and avoid repeating a standard composition.";
         };
+    }
+
+    private String createVariationDirective(String styleTone, String genreHint) {
+        List<String> variations = switch (styleTone) {
+            case "energetic-bright" -> List.of(
+                    "Create a busking-style variation with a cheerful face, a side-step pose, and one tiny performance prop inspired by " + genreHint + ".",
+                    "Create a festival-style variation with a bouncing pose, one playful accessory, and two small sparkle or rhythm marks.",
+                    "Create a dance-practice variation with a stretched pose, a mischievous smile, and one compact prop or badge.",
+                    "Create a party-host variation with a welcoming pose, one celebratory handheld prop, and a more animated expression."
+            );
+            case "energetic-intense" -> List.of(
+                    "Create a rock-stage variation with a sharp pose, one edgy prop inspired by " + genreHint + ", and short impact marks.",
+                    "Create a sprinting variation with a forward-driving pose, a fierce or focused face, and one minimal performance accessory.",
+                    "Create a DJ-or-hype variation with a punchy silhouette, one compact music tool, and strong rhythm marks.",
+                    "Create a rebellious variation with asymmetrical motion, one standout accessory, and a more daring facial expression."
+            );
+            case "calm-deep" -> List.of(
+                    "Create a late-night listening variation with a settled pose, a soft calm face, and one quiet music prop inspired by " + genreHint + ".",
+                    "Create a wistful walking variation with a drifting pose, one restrained accessory, and one or two floating mood marks.",
+                    "Create a jazz-club variation with a gentle sway, one compact instrument-like prop, and sparse note marks.",
+                    "Create a dreamy pause variation with a still pose, a reflective face, and one subtle atmospheric prop or line detail."
+            );
+            default -> List.of(
+                    "Create a casual humming variation with a light walking pose, one simple music prop, and a friendly face.",
+                    "Create a songwriting variation with a small prop inspired by " + genreHint + " and a thoughtful but playful expression.",
+                    "Create a weekend-groove variation with a relaxed pose, one charming accessory, and two tiny mood marks.",
+                    "Create a street-doodle variation with a slightly awkward pose, one distinct prop, and a simple upbeat face."
+            );
+        };
+        AtomicInteger counter = VARIATION_COUNTER.computeIfAbsent(styleTone, ignored -> new AtomicInteger(0));
+        int index = Math.floorMod(counter.getAndIncrement(), variations.size());
+        return variations.get(index);
     }
 }
