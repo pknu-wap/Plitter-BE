@@ -22,6 +22,9 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class SpotifyTrackClient {
+    private static final int SPOTIFY_SEARCH_MIN_LIMIT = 1;
+    private static final int SPOTIFY_SEARCH_MAX_LIMIT = 10;
+    private static final int SPOTIFY_SEARCH_DEFAULT_LIMIT = 5;
 
     @Value("${spotify.client-id}")
     private String clientId;
@@ -32,9 +35,10 @@ public class SpotifyTrackClient {
     public List<TrackSearchResponse> searchTracks(String keyword, Integer limit) {
         try {
             SpotifyApi spotifyApi = createSpotifyApi();
+            int normalizedLimit = normalizeLimit(limit);
 
             SearchItemRequest searchItemRequest = spotifyApi.searchItem(keyword, ModelObjectType.TRACK.getType())
-                    .limit(limit)
+                    .limit(normalizedLimit)
                     .build();
 
             SearchResult searchResult = searchItemRequest.execute();
@@ -71,6 +75,16 @@ public class SpotifyTrackClient {
         } catch (Exception e) {
             throw new ApiException(TrackErrorCode.TRACK_SEARCH_FAILED);
         }
+    }
+
+    private int normalizeLimit(Integer limit) {
+        if (limit == null) {
+            return SPOTIFY_SEARCH_DEFAULT_LIMIT;
+        }
+        if (limit < SPOTIFY_SEARCH_MIN_LIMIT) {
+            return SPOTIFY_SEARCH_MIN_LIMIT;
+        }
+        return Math.min(limit, SPOTIFY_SEARCH_MAX_LIMIT);
     }
 
     private SpotifyApi createSpotifyApi() throws Exception {
