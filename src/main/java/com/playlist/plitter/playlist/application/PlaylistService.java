@@ -63,19 +63,7 @@ public class PlaylistService {
         PlaylistEntity playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new ApiException(PlaylistErrorCode.PLAYLIST_NOT_FOUND));
 
-        List<RecommendationResponse> recommendations = recommendationsRepository.findAllByPlaylist(playlist)
-                .stream()
-                .map(recommendation -> {
-                    TrackEntity track = recommendation.getTrack();
-                    return new RecommendationResponse(
-                            track.getSpotifyTrackId(),
-                            track.getTitle(),
-                            track.getArtistName(),
-                            track.getAlbumCoverUrl(),
-                            track.getPreviewUrl()
-                    );
-                })
-                .toList();
+        List<RecommendationResponse> recommendations = toRecommendationResponses(playlist);
 
         return new PlaylistResponse(
                 playlist.getId(),
@@ -103,6 +91,7 @@ public class PlaylistService {
         PlaylistEntity playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new ApiException(PlaylistErrorCode.PLAYLIST_NOT_FOUND));
 
+        List<RecommendationResponse> recommendations = toRecommendationResponses(playlist);
         String latestCoverImageUrl = recommendationsRepository.findTopByPlaylistOrderByCreatedAtDescIdDesc(playlist)
                 .map(RecommendationsEntity::getTrack)
                 .map(TrackEntity::getAlbumCoverUrl)
@@ -114,8 +103,26 @@ public class PlaylistService {
                 playlist.getShortId(),
                 recommendationCount,
                 recommendationCount >= 10,
+                playlist.getOwner().getNickname(),
+                recommendations,
                 latestCoverImageUrl
         );
+    }
+
+    private List<RecommendationResponse> toRecommendationResponses(PlaylistEntity playlist) {
+        return recommendationsRepository.findAllByPlaylist(playlist)
+                .stream()
+                .map(recommendation -> {
+                    TrackEntity track = recommendation.getTrack();
+                    return new RecommendationResponse(
+                            track.getSpotifyTrackId(),
+                            track.getTitle(),
+                            track.getArtistName(),
+                            track.getAlbumCoverUrl(),
+                            track.getPreviewUrl()
+                    );
+                })
+                .toList();
     }
 
 }
