@@ -29,12 +29,20 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.net.URI;
+import java.awt.Point;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayDeque;
 import java.util.Base64;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.imageio.ImageIO;
 
 @Primary
 @Component
@@ -44,6 +52,7 @@ public class S3ImageStorageClient implements ImageStorageClient, DisposableBean 
     private static final Pattern DATA_URI_PATTERN =
             Pattern.compile("^data:(image/[a-zA-Z0-9.+-]+);base64,(.+)$", Pattern.DOTALL);
     private static final String DEFAULT_CONTENT_TYPE = MediaType.IMAGE_PNG_VALUE;
+    private static final int BACKGROUND_WHITE_THRESHOLD = 245;
 
     private final String bucket;
     private final String keyPrefix;
@@ -153,8 +162,7 @@ public class S3ImageStorageClient implements ImageStorageClient, DisposableBean 
         String contentType = matcher.group(1);
         String base64Data = matcher.group(2);
         byte[] bytes = Base64.getDecoder().decode(base64Data);
-        String extension = resolveExtension(contentType);
-        return new StoredImageInput(bytes, contentType, extension);
+        return normalizeStoredImage(bytes, contentType);
     }
 
     private StoredImageInput downloadRemoteImage(String sourceImageUrl) {
@@ -171,8 +179,127 @@ public class S3ImageStorageClient implements ImageStorageClient, DisposableBean 
         String contentType = response.getHeaders().getContentType() != null
                 ? response.getHeaders().getContentType().toString()
                 : DEFAULT_CONTENT_TYPE;
-        String extension = resolveExtension(contentType);
-        return new StoredImageInput(bytes, contentType, extension);
+        return normalizeStoredImage(bytes, contentType);
+    }
+
+    private StoredImageInput normalizeStoredImage(byte[] bytes, String contentType) {
+        try {
+            BufferedImage image = ImageIO.read(new ByteArrayInputStream(bytes));
+            if (image == null) {
+                String extension = resolveExtension(contentType);
+                return new StoredImageInput(bytes, contentType, extension);
+            }
+
+            BufferedImage alphaImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            alphaImage.getGraphics().drawImage(image, 0, 0, null);
+            alphaImage.getGraphics().dispose();
+
+            int transparentPixelCount = makeOuterBrightBackgroundTransparent(alphaImage);
+            if (transparentPixelCount == 0) {
+                transparentPixelCount = makeAllBrightPixelsTransparent(alphaImage);
+            }
+
+            if (transparentPixelCount == 0) {
+                String extension = resolveExtension(contentType);
+                return new StoredImageInput(bytes, contentType, extension);
+            }
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ImageIO.write(alphaImage, "png", outputStream);
+            return new StoredImageInput(outputStream.toByteArray(), DEFAULT_CONTENT_TYPE, "png");
+        } catch (Exception e) {
+            log.warn("Image background normalization skipped: {}", e.getMessage());
+            String extension = resolveExtension(contentType);
+            return new StoredImageInput(bytes, contentType, extension);
+        }
+    }
+
+    private int makeOuterBrightBackgroundTransparent(BufferedImage image) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        ArrayDeque<Point> queue = new ArrayDeque<>();
+        Set<Long> visited = new HashSet<>();
+
+        for (int x = 0; x < width; x++) {
+            enqueueBackgroundPixel(image, queue, visited, x, 0);
+            enqueueBackgroundPixel(image, queue, visited, x, height - 1);
+        }
+        for (int y = 0; y < height; y++) {
+            enqueueBackgroundPixel(image, queue, visited, 0, y);
+            enqueueBackgroundPixel(image, queue, visited, width - 1, y);
+        }
+
+        int transparentCount = 0;
+        while (!queue.isEmpty()) {
+            Point point = queue.removeFirst();
+            int x = point.x;
+            int y = point.y;
+
+            if (!isBrightBackgroundCandidate(image.getRGB(x, y))) {
+                continue;
+            }
+
+            image.setRGB(x, y, 0x00000000);
+            transparentCount++;
+
+            if (x > 0) {
+                enqueueBackgroundPixel(image, queue, visited, x - 1, y);
+            }
+            if (x + 1 < width) {
+                enqueueBackgroundPixel(image, queue, visited, x + 1, y);
+            }
+            if (y > 0) {
+                enqueueBackgroundPixel(image, queue, visited, x, y - 1);
+            }
+            if (y + 1 < height) {
+                enqueueBackgroundPixel(image, queue, visited, x, y + 1);
+            }
+        }
+        return transparentCount;
+    }
+
+    private void enqueueBackgroundPixel(
+            BufferedImage image,
+            ArrayDeque<Point> queue,
+            Set<Long> visited,
+            int x,
+            int y
+    ) {
+        long key = (((long) x) << 32) | (y & 0xffffffffL);
+        if (!visited.add(key)) {
+            return;
+        }
+        if (!isBrightBackgroundCandidate(image.getRGB(x, y))) {
+            return;
+        }
+        queue.addLast(new Point(x, y));
+    }
+
+    private int makeAllBrightPixelsTransparent(BufferedImage image) {
+        int transparentCount = 0;
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                if (isBrightBackgroundCandidate(image.getRGB(x, y))) {
+                    image.setRGB(x, y, 0x00000000);
+                    transparentCount++;
+                }
+            }
+        }
+        return transparentCount;
+    }
+
+    private boolean isBrightBackgroundCandidate(int argb) {
+        int alpha = (argb >> 24) & 0xff;
+        if (alpha == 0) {
+            return true;
+        }
+
+        int red = (argb >> 16) & 0xff;
+        int green = (argb >> 8) & 0xff;
+        int blue = argb & 0xff;
+        return red >= BACKGROUND_WHITE_THRESHOLD
+                && green >= BACKGROUND_WHITE_THRESHOLD
+                && blue >= BACKGROUND_WHITE_THRESHOLD;
     }
 
     private String createObjectKey(Long playlistId, String extension) {
