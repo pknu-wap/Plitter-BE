@@ -43,6 +43,7 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
     private static final Logger log = LoggerFactory.getLogger(OpenAiCharacterImageEditClient.class);
     private static final String IMAGE_EDIT_PATH = "/v1/images/edits";
     private static final String DEFAULT_IMAGE_MEDIA_TYPE = "image/png";
+    private static final String TRANSPARENT_BACKGROUND = "transparent";
     private static final String SHAPE_PRESERVATION_RULES =
             "Strict character constraints: keep the same doodle star mascot family and base silhouette logic. " +
                     "Preserve the rough hand-drawn line quality and naive doodle character feel from the input image. " +
@@ -100,30 +101,8 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
                 throw new ApiException(CharacterErrorCode.CHARACTER_GENERATION_FAILED);
             }
 
-            MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
-            formData.add("model", openAiModel);
-            formData.add("prompt", buildPrompt(request.editSpec().promptText(), inputImages.size() > 1));
-            formData.add("size", openAiSize);
-            formData.add("quality", openAiQuality);
-            formData.add("n", "1");
-            formData.add("output_format", "png");
-            for (SourceImage inputImage : inputImages) {
-                HttpHeaders imageHeaders = new HttpHeaders();
-                imageHeaders.setContentType(inputImage.mediaType());
-                HttpEntity<ByteArrayResource> imagePart = new HttpEntity<>(
-                        new NamedByteArrayResource(inputImage.bytes(), inputImage.filename()),
-                        imageHeaders
-                );
-                formData.add("image[]", imagePart);
-            }
-
-            ImageEditResponse response = openAiRestClient.post()
-                    .uri(IMAGE_EDIT_PATH)
-                    .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + openAiApiKey)
-                    .body(formData)
-                    .retrieve()
-                    .body(ImageEditResponse.class);
+            String prompt = buildPrompt(request.editSpec().promptText(), inputImages.size() > 1);
+            ImageEditResponse response = requestImageEdit(prompt, inputImages, true);
 
             if (response == null || response.data == null || response.data.isEmpty()) {
                 log.error("OpenAI image edit response is empty");
@@ -153,6 +132,69 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
             log.error("OpenAI image edit unexpected failure: {}", e.getMessage(), e);
             throw new ApiException(CharacterErrorCode.CHARACTER_GENERATION_FAILED);
         }
+    }
+
+    private ImageEditResponse requestImageEdit(String prompt, List<SourceImage> inputImages, boolean preferTransparentBackground) {
+        MultiValueMap<String, Object> formData = createImageEditFormData(prompt, inputImages, preferTransparentBackground);
+        try {
+            return openAiRestClient.post()
+                    .uri(IMAGE_EDIT_PATH)
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + openAiApiKey)
+                    .body(formData)
+                    .retrieve()
+                    .body(ImageEditResponse.class);
+        } catch (RestClientResponseException e) {
+            if (preferTransparentBackground && shouldRetryWithoutBackground(e)) {
+                log.warn(
+                        "OpenAI image edit rejected transparent background parameter. Retrying without background. status={}, body={}",
+                        e.getStatusCode(),
+                        e.getResponseBodyAsString()
+                );
+                return requestImageEdit(prompt, inputImages, false);
+            }
+            throw e;
+        }
+    }
+
+    private MultiValueMap<String, Object> createImageEditFormData(
+            String prompt,
+            List<SourceImage> inputImages,
+            boolean includeTransparentBackground
+    ) {
+        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
+        formData.add("model", openAiModel);
+        formData.add("prompt", prompt);
+        formData.add("size", openAiSize);
+        formData.add("quality", openAiQuality);
+        formData.add("n", "1");
+        formData.add("output_format", "png");
+        if (includeTransparentBackground) {
+            formData.add("background", TRANSPARENT_BACKGROUND);
+        }
+        for (SourceImage inputImage : inputImages) {
+            HttpHeaders imageHeaders = new HttpHeaders();
+            imageHeaders.setContentType(inputImage.mediaType());
+            HttpEntity<ByteArrayResource> imagePart = new HttpEntity<>(
+                    new NamedByteArrayResource(inputImage.bytes(), inputImage.filename()),
+                    imageHeaders
+            );
+            formData.add("image[]", imagePart);
+        }
+        return formData;
+    }
+
+    private boolean shouldRetryWithoutBackground(RestClientResponseException e) {
+        String responseBody = e.getResponseBodyAsString();
+        if (!StringUtils.hasText(responseBody)) {
+            return false;
+        }
+        String normalizedBody = responseBody.toLowerCase();
+        return normalizedBody.contains("background")
+                && (normalizedBody.contains("unsupported")
+                || normalizedBody.contains("not supported")
+                || normalizedBody.contains("invalid")
+                || normalizedBody.contains("unknown parameter"));
     }
 
     private SimpleClientHttpRequestFactory createRequestFactory(int timeoutMillis) {
