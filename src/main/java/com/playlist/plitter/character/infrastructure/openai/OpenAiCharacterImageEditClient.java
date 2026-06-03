@@ -43,6 +43,7 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
     private static final Logger log = LoggerFactory.getLogger(OpenAiCharacterImageEditClient.class);
     private static final String IMAGE_EDIT_PATH = "/v1/images/edits";
     private static final String DEFAULT_IMAGE_MEDIA_TYPE = "image/png";
+    private static final int TRANSPARENT_BACKGROUND_THRESHOLD = 245;
     private static final String SHAPE_PRESERVATION_RULES =
             "Strict character constraints: keep the same doodle star mascot family and base silhouette logic. " +
                     "Preserve the rough hand-drawn line quality and naive doodle character feel from the input image. " +
@@ -132,10 +133,10 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
 
             ImageResult result = response.data.get(0);
             if (StringUtils.hasText(result.url)) {
-                return result.url;
+                return toTransparentPngDataUri(downloadGeneratedImage(result.url));
             }
             if (StringUtils.hasText(result.b64Json)) {
-                return "data:image/png;base64," + result.b64Json;
+                return toTransparentPngDataUri(java.util.Base64.getDecoder().decode(result.b64Json));
             }
             log.error("OpenAI image edit response has neither url nor b64_json");
             throw new ApiException(CharacterErrorCode.CHARACTER_GENERATION_FAILED);
@@ -195,6 +196,20 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
         MediaType mediaType = resolveImageMediaType(sourceImageResponse.getHeaders().getContentType());
         String filename = resolveFilename(sourceImageResponse.getHeaders(), sourceImageLocation);
         return new SourceImage(body, mediaType, filename);
+    }
+
+    private byte[] downloadGeneratedImage(String imageUrl) {
+        ResponseEntity<byte[]> response = sourceImageRestClient.get()
+                .uri(URI.create(imageUrl))
+                .retrieve()
+                .toEntity(byte[].class);
+
+        byte[] body = response.getBody();
+        if (body == null || body.length == 0) {
+            log.error("Generated image download returned empty body: {}", imageUrl);
+            throw new ApiException(CharacterErrorCode.CHARACTER_GENERATION_FAILED);
+        }
+        return body;
     }
 
     private List<SourceImage> prepareInputImages(SourceImage sourceImage) throws Exception {
@@ -363,6 +378,50 @@ public class OpenAiCharacterImageEditClient implements CharacterImageEditClient 
             return sanitized.substring(slashIndex + 1);
         }
         return "base-character.png";
+    }
+
+    private String toTransparentPngDataUri(byte[] imageBytes) throws Exception {
+        BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageBytes));
+        if (image == null) {
+            log.error("Generated image bytes could not be decoded");
+            throw new ApiException(CharacterErrorCode.CHARACTER_GENERATION_FAILED);
+        }
+
+        BufferedImage transparentImage = new BufferedImage(
+                image.getWidth(),
+                image.getHeight(),
+                BufferedImage.TYPE_INT_ARGB
+        );
+
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                int argb = image.getRGB(x, y);
+                transparentImage.setRGB(x, y, toTransparentBackgroundPixel(argb));
+            }
+        }
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ImageIO.write(transparentImage, "png", outputStream);
+        return "data:image/png;base64," + java.util.Base64.getEncoder().encodeToString(outputStream.toByteArray());
+    }
+
+    private int toTransparentBackgroundPixel(int argb) {
+        int alpha = (argb >> 24) & 0xff;
+        int red = (argb >> 16) & 0xff;
+        int green = (argb >> 8) & 0xff;
+        int blue = argb & 0xff;
+
+        if (alpha == 0) {
+            return 0x00000000;
+        }
+
+        boolean nearWhite = red >= TRANSPARENT_BACKGROUND_THRESHOLD
+                && green >= TRANSPARENT_BACKGROUND_THRESHOLD
+                && blue >= TRANSPARENT_BACKGROUND_THRESHOLD;
+        if (nearWhite) {
+            return 0x00000000;
+        }
+        return argb;
     }
 
     private static class NamedByteArrayResource extends ByteArrayResource {
