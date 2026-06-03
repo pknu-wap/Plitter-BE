@@ -53,6 +53,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/playlists/recommendations/*/public").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/playlists/*/recommendations").permitAll()
                         .requestMatchers("/api/tracks/search").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/tracks/*/play").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 )
