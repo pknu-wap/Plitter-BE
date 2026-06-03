@@ -71,7 +71,7 @@ public class CharacterEditSpecGenerator {
                     - Do not polish, smooth, vectorize, thicken, or professionalize the line art.
                     - Preserve small irregularities and naive hand-drawn imperfections.
                     - No color, no shading, no gradients, no 3D rendering, and no paper texture.
-                    - Transparent background.
+                    - Use a fully transparent background with alpha, not a plain white background.
                     - Avoid solid filled areas; use sparse simple hatching only if necessary.
                     Style direction:
                     %s
