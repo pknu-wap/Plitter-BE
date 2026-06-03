@@ -95,6 +95,18 @@ public class PlaylistService {
         PlaylistEntity playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new ApiException(PlaylistErrorCode.PLAYLIST_NOT_FOUND));
 
+        return toPlaylistPublicResponse(playlist);
+    }
+
+    @Transactional(readOnly = true)
+    public PlaylistPublicResponse getPlaylistPublicByShortId(String shortId) {
+        PlaylistEntity playlist = playlistRepository.findByShortId(shortId)
+                .orElseThrow(() -> new ApiException(PlaylistErrorCode.PLAYLIST_NOT_FOUND));
+
+        return toPlaylistPublicResponse(playlist);
+    }
+
+    private PlaylistPublicResponse toPlaylistPublicResponse(PlaylistEntity playlist) {
         List<RecommendationResponse> recommendations = toRecommendationResponses(playlist);
         String latestCoverImageUrl = recommendationsRepository.findTopByPlaylistOrderByCreatedAtDescIdDesc(playlist)
                 .map(RecommendationsEntity::getTrack)

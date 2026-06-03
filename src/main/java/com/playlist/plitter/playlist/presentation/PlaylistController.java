@@ -54,4 +54,12 @@ public class PlaylistController {
         return ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, response);
     }
 
+    @GetMapping("/playlists/share/{shortId}/public")
+    public ResponseDto<PlaylistPublicResponse> getPlaylistPublicByShortId(
+            @PathVariable String shortId
+    ) {
+        PlaylistPublicResponse response = playlistService.getPlaylistPublicByShortId(shortId);
+        return ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, response);
+    }
+
 }
