@@ -1,13 +1,14 @@
 package com.playlist.plitter.playlist.application;
 
+import com.playlist.plitter.auth.domain.entity.UserEntity;
+import com.playlist.plitter.auth.domain.repository.UserRepository;
+import com.playlist.plitter.auth.exception.AuthErrorCode;
+import com.playlist.plitter.global.exception.ApiException;
 import com.playlist.plitter.playlist.application.dto.PlaylistCheckResponse;
 import com.playlist.plitter.playlist.application.dto.PlaylistCreateResponse;
 import com.playlist.plitter.playlist.application.dto.PlaylistResponse;
 import com.playlist.plitter.playlist.domain.entity.PlaylistEntity;
 import com.playlist.plitter.playlist.domain.repository.PlaylistRepository;
-import com.playlist.plitter.auth.domain.entity.UserEntity;
-import com.playlist.plitter.auth.domain.repository.UserRepository;
-import com.playlist.plitter.global.exception.ApiException;
 import com.playlist.plitter.playlist.exception.PlaylistErrorCode;
 import com.playlist.plitter.recommendations.application.dto.RecommendationResponse;
 import com.playlist.plitter.recommendations.domain.repository.RecommendationsRepository;
@@ -17,13 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
-import com.playlist.plitter.auth.exception.AuthErrorCode;
-import com.playlist.plitter.global.exception.ApiException;
-import com.playlist.plitter.playlist.exception.PlaylistErrorCode;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.Optional;
 import java.util.UUID;
 
@@ -67,6 +61,18 @@ public class PlaylistService {
         PlaylistEntity playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new ApiException(PlaylistErrorCode.PLAYLIST_NOT_FOUND));
 
+        return toPlaylistResponse(playlist);
+    }
+
+    @Transactional(readOnly = true)
+    public PlaylistResponse getPlaylistByShortId(String shortId) {
+        PlaylistEntity playlist = playlistRepository.findByShortId(shortId)
+                .orElseThrow(() -> new ApiException(PlaylistErrorCode.PLAYLIST_NOT_FOUND));
+
+        return toPlaylistResponse(playlist);
+    }
+
+    private PlaylistResponse toPlaylistResponse(PlaylistEntity playlist) {
         List<RecommendationResponse> recommendations = recommendationsRepository.findAllByPlaylist(playlist)
                 .stream()
                 .map(recommendation -> {
