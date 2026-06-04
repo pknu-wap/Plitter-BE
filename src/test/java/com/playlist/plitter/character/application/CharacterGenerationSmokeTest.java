@@ -63,7 +63,7 @@ class CharacterGenerationSmokeTest {
                         "select p.id from PlaylistEntity p where p.recommendationCount >= :required order by p.id desc",
                         Long.class
                 )
-                .setParameter("required", 10)
+                .setParameter("required", 5)
                 .setMaxResults(1)
                 .getResultList()
                 .stream()

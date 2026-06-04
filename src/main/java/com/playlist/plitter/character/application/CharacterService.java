@@ -35,7 +35,7 @@ import java.util.Objects;
 @Transactional(readOnly = true)
 public class CharacterService {
 
-    private static final int REQUIRED_RECOMMENDATION_COUNT = 10;
+    private static final int REQUIRED_RECOMMENDATION_COUNT = 5;
     private static final int SAVE_RETRY_COUNT = 2;
 
     private final CharacterRepository characterRepository;
