@@ -13,6 +13,7 @@ import java.util.Optional;
 @Repository
 public interface PlaylistRepository extends JpaRepository<PlaylistEntity, Long> {
     boolean existsByOwner(UserEntity owner);
+    boolean existsByShortId(String shortId);
     Optional<PlaylistEntity> findByOwnerId(Long ownerId);
     Optional<PlaylistEntity> findByIdAndOwner_Id(Long playlistId, Long ownerId);
     Optional<PlaylistEntity> findByShortId(String shortId);

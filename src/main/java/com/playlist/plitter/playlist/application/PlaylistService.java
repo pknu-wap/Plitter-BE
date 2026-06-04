@@ -19,11 +19,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Function;
+import java.security.SecureRandom;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +31,10 @@ import java.util.stream.Collectors;
 public class PlaylistService {
 
     private static final int REQUIRED_RECOMMENDATION_COUNT_FOR_CHARACTER = 5;
+    private static final String PUBLIC_SHARE_ID_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private static final int PUBLIC_SHARE_ID_LENGTH = 10;
+    private static final int PUBLIC_SHARE_ID_GENERATION_MAX_ATTEMPTS = 10;
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final PlaylistRepository playlistRepository;
     private final UserRepository userRepository;
@@ -47,11 +51,11 @@ public class PlaylistService {
             throw new ApiException(PlaylistErrorCode.PLAYLIST_ALREADY_EXISTS);
         }
 
-        String shortId = UUID.randomUUID().toString().substring(0, 5);
+        String publicShareId = generatePublicShareId();
 
         PlaylistEntity playlist = PlaylistEntity.builder()
                 .owner(user)
-                .shortId(shortId)
+                .shortId(publicShareId)
                 .characterVersion(0)
                 .build();
 
@@ -60,7 +64,7 @@ public class PlaylistService {
         Long playlistId = saved.getId();
         String shareUrl = "https://ourdomain.com/playlist/" + saved.getShortId();
 
-        return new PlaylistCreateResponse(playlistId, shortId, shareUrl);
+        return new PlaylistCreateResponse(playlistId, saved.getShortId(), shareUrl);
     }
 
     @Transactional(readOnly = true)
@@ -93,16 +97,8 @@ public class PlaylistService {
     }
 
     @Transactional(readOnly = true)
-    public PlaylistPublicResponse getPlaylistPublic(Long playlistId) {
-        PlaylistEntity playlist = playlistRepository.findById(playlistId)
-                .orElseThrow(() -> new ApiException(PlaylistErrorCode.PLAYLIST_NOT_FOUND));
-
-        return toPlaylistPublicResponse(playlist);
-    }
-
-    @Transactional(readOnly = true)
-    public PlaylistPublicResponse getPlaylistPublicByShortId(String shortId) {
-        PlaylistEntity playlist = playlistRepository.findByShortId(shortId)
+    public PlaylistPublicResponse getPlaylistPublicByPublicShareId(String publicShareId) {
+        PlaylistEntity playlist = playlistRepository.findByShortId(publicShareId)
                 .orElseThrow(() -> new ApiException(PlaylistErrorCode.PLAYLIST_NOT_FOUND));
 
         return toPlaylistPublicResponse(playlist);
@@ -117,7 +113,6 @@ public class PlaylistService {
 
         int recommendationCount = recommendations.size();
         return new PlaylistPublicResponse(
-                playlist.getId(),
                 playlist.getShortId(),
                 recommendationCount,
                 recommendationCount >= REQUIRED_RECOMMENDATION_COUNT_FOR_CHARACTER,
@@ -148,6 +143,26 @@ public class PlaylistService {
                     );
                 })
                 .toList();
+    }
+
+    private String generatePublicShareId() {
+        for (int attempt = 0; attempt < PUBLIC_SHARE_ID_GENERATION_MAX_ATTEMPTS; attempt++) {
+            String candidate = randomBase62(PUBLIC_SHARE_ID_LENGTH);
+            if (!playlistRepository.existsByShortId(candidate)) {
+                return candidate;
+            }
+        }
+
+        throw new IllegalStateException("public share id generation failed");
+    }
+
+    private String randomBase62(int length) {
+        StringBuilder builder = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            int randomIndex = SECURE_RANDOM.nextInt(PUBLIC_SHARE_ID_ALPHABET.length());
+            builder.append(PUBLIC_SHARE_ID_ALPHABET.charAt(randomIndex));
+        }
+        return builder.toString();
     }
 
 }

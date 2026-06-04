@@ -5,8 +5,7 @@ import com.playlist.plitter.recommendations.application.dto.RecommendationRespon
 import java.util.List;
 
 public record PlaylistPublicResponse(
-        Long playlistId,
-        String shortId,
+        String publicShareId,
         Integer recommendationCount,
         Boolean canCreateCharacter,
         String ownerNickname,
