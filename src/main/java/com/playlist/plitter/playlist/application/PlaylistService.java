@@ -30,6 +30,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PlaylistService {
 
+    private static final int REQUIRED_RECOMMENDATION_COUNT_FOR_CHARACTER = 5;
+
     private final PlaylistRepository playlistRepository;
     private final UserRepository userRepository;
     private final RecommendationsRepository recommendationsRepository;
@@ -72,7 +74,7 @@ public class PlaylistService {
         return new PlaylistResponse(
                 playlist.getId(),
                 recommendationCount,
-                recommendationCount >= 10,
+                recommendationCount >= REQUIRED_RECOMMENDATION_COUNT_FOR_CHARACTER,
                 recommendations
         );
     }
@@ -118,7 +120,7 @@ public class PlaylistService {
                 playlist.getId(),
                 playlist.getShortId(),
                 recommendationCount,
-                recommendationCount >= 10,
+                recommendationCount >= REQUIRED_RECOMMENDATION_COUNT_FOR_CHARACTER,
                 playlist.getOwner().getNickname(),
                 recommendations,
                 latestCoverImageUrl
