@@ -134,7 +134,6 @@ public class RecommendationsService {
 
         return new RecommendationCreateResponse(
                 savedRecommendation.getId(),
-                playlist.getId(),
                 savedRecommendation.getCreatedAt()
         );
     }
