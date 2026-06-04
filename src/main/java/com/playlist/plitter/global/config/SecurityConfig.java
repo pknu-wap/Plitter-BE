@@ -50,6 +50,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/logout").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/playlists/share/*/public").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/playlists/recommendations/*/public").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/playlists/share/*/recommendations").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/playlists/*/recommendations").permitAll()
                         .requestMatchers("/api/tracks/search").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tracks/*/play").permitAll()

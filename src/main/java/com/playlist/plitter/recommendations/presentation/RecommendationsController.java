@@ -27,6 +27,20 @@ public class RecommendationsController {
         return ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, response);
     }
 
+    @PostMapping("/share/{publicShareId}/recommendations")
+    public ResponseDto<RecommendationCreateResponse> createRecommendationByPublicShareId(
+            @PathVariable String publicShareId,
+            @AuthenticationPrincipal Long recommenderUserId,
+            @RequestBody RecommendationCreateRequest request
+    ) {
+        RecommendationCreateResponse response = recommendationsService.createRecommendationByPublicShareId(
+                publicShareId,
+                recommenderUserId,
+                request
+        );
+        return ResponseDto.ofSuccess(SuccessMessage.OPERATION_SUCCESS, response);
+    }
+
     @GetMapping("/recommendations/{recommendationId}")
     public ResponseDto<RecommendationDetailResponse> getRecommendationDetail(
             @PathVariable Long recommendationId
