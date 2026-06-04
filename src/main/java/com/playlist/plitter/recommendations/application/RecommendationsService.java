@@ -47,7 +47,25 @@ public class RecommendationsService {
     ) {
         PlaylistEntity playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new RuntimeException("플레이리스트를 찾을 수 없습니다."));
+        return createRecommendation(playlist, recommenderUserId, request);
+    }
 
+    @Transactional
+    public RecommendationCreateResponse createRecommendationByPublicShareId(
+            String publicShareId,
+            Long recommenderUserId,
+            RecommendationCreateRequest request
+    ) {
+        PlaylistEntity playlist = playlistRepository.findByShortId(publicShareId)
+                .orElseThrow(() -> new RuntimeException("플레이리스트를 찾을 수 없습니다."));
+        return createRecommendation(playlist, recommenderUserId, request);
+    }
+
+    private RecommendationCreateResponse createRecommendation(
+            PlaylistEntity playlist,
+            Long recommenderUserId,
+            RecommendationCreateRequest request
+    ) {
         UserEntity recommenderUser = null;
         String guestToken = request.guestToken();
         String randomNickname = null;
