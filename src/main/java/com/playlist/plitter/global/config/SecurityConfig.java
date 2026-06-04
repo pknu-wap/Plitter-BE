@@ -48,7 +48,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/kakao/**").permitAll()
                         .requestMatchers("/api/auth/guest").permitAll()
                         .requestMatchers("/auth/logout").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/playlists/*/public").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/playlists/share/*/public").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/playlists/recommendations/*/public").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/playlists/*/recommendations").permitAll()
