@@ -53,6 +53,10 @@ public class S3ImageStorageClient implements ImageStorageClient, DisposableBean 
             Pattern.compile("^data:(image/[a-zA-Z0-9.+-]+);base64,(.+)$", Pattern.DOTALL);
     private static final String DEFAULT_CONTENT_TYPE = MediaType.IMAGE_PNG_VALUE;
     private static final int BACKGROUND_WHITE_THRESHOLD = 245;
+    private static final int STROKE_RESIDUAL_WHITE_THRESHOLD = 235;
+    private static final int STROKE_SOFT_BACKGROUND_THRESHOLD = 220;
+    private static final int STROKE_SOFT_BACKGROUND_ALPHA_THRESHOLD = 96;
+    private static final int MIN_STROKE_ALPHA = 170;
 
     private final String bucket;
     private final String keyPrefix;
@@ -199,6 +203,8 @@ public class S3ImageStorageClient implements ImageStorageClient, DisposableBean 
                 transparentPixelCount = makeAllBrightPixelsTransparent(alphaImage);
             }
 
+            normalizeForegroundStrokes(alphaImage);
+
             if (transparentPixelCount == 0) {
                 String extension = resolveExtension(contentType);
                 return new StoredImageInput(bytes, contentType, extension);
@@ -286,6 +292,38 @@ public class S3ImageStorageClient implements ImageStorageClient, DisposableBean 
             }
         }
         return transparentCount;
+    }
+
+    private void normalizeForegroundStrokes(BufferedImage image) {
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                int argb = image.getRGB(x, y);
+                int alpha = (argb >> 24) & 0xff;
+                if (alpha == 0) {
+                    continue;
+                }
+
+                int red = (argb >> 16) & 0xff;
+                int green = (argb >> 8) & 0xff;
+                int blue = argb & 0xff;
+                int luminance = (red + green + blue) / 3;
+
+                if (luminance >= STROKE_RESIDUAL_WHITE_THRESHOLD
+                        || (luminance >= STROKE_SOFT_BACKGROUND_THRESHOLD
+                        && alpha <= STROKE_SOFT_BACKGROUND_ALPHA_THRESHOLD)) {
+                    image.setRGB(x, y, 0x00000000);
+                    continue;
+                }
+
+                int darkness = 255 - luminance;
+                int targetAlpha = Math.max(alpha, Math.min(255, darkness * 2));
+                if (luminance < STROKE_SOFT_BACKGROUND_THRESHOLD) {
+                    targetAlpha = Math.max(targetAlpha, MIN_STROKE_ALPHA);
+                }
+
+                image.setRGB(x, y, (targetAlpha << 24));
+            }
+        }
     }
 
     private boolean isBrightBackgroundCandidate(int argb) {
