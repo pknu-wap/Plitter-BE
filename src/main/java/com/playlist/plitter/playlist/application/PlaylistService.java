@@ -90,10 +90,11 @@ public class PlaylistService {
         Optional<PlaylistEntity> playlist = playlistRepository.findByOwnerId(userId);
 
         if (playlist.isPresent()) {
-            return new PlaylistCheckResponse(true, playlist.get().getId());
+            PlaylistEntity savedPlaylist = playlist.get();
+            return new PlaylistCheckResponse(true, savedPlaylist.getId(), savedPlaylist.getShortId());
         }
 
-        return new PlaylistCheckResponse(false, null);
+        return new PlaylistCheckResponse(false, null, null);
     }
 
     @Transactional(readOnly = true)
