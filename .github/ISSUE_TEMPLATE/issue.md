@@ -7,11 +7,7 @@ assignees: ''
 
 ---
 
-## 📄 DESCRIPTION
-<!-- 이슈 내용 요약 설명 -->
->
+## Description
 
-## ✅ TO-DO
+## To-do
 - [ ] todo
-
-## ➕ETC
