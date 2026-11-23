@@ -37,7 +37,8 @@
 - 전체 main Java 소스를 Java 17 대상으로 컴파일했다.
 - JUnit Platform 6.0.3으로 관련 테스트 39개를 실행했으며, 39개 성공·0개 실패·0개 건너뜀이다.
 - H2의 PostgreSQL 호환 모드에서 실제 Spring Data JPA 저장·재조회를 검증했다.
-- 샌드박스에서 Gradle 캐시 쓰기가 제한돼, 기존 애플리케이션 JAR의 의존성과 로컬 JUnit 의존성을 사용해 컴파일·실행했다. Gradle 전체 빌드 성공을 의미하지 않는다.
+- 샌드박스에서 Gradle 캐시 쓰기가 제한돼, 기존 애플리케이션 JAR의 의존성과 로컬 JUnit 의존성을 사용해 컴파일·실행했다.
+- PR 준비 시 별도 체크아웃과 임시 Gradle 캐시로 표준 test·bootJar도 시도했으나, Gradle 데몬의 소켓 생성이 `Operation not permitted`로 차단됐다. 표준 Gradle 빌드 성공을 의미하지 않는다.
 
 | 검증 영역 | 확인한 내용 |
 | --- | --- |
