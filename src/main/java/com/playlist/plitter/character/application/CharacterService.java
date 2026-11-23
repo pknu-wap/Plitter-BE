@@ -54,6 +54,7 @@ public class CharacterService {
     private final MusicFeatureClient musicFeatureClient;
     private final CharacterEditSpecGenerator characterEditSpecGenerator;
     private final CharacterResultMetadataGenerator characterResultMetadataGenerator;
+    private final CharacterCreativeMetadataGenerator creativeMetadataGenerator;
     private final LegacyCharacterResultMetadataGenerator legacyMetadataGenerator;
     private final MusicProfileAnalyzer musicProfileAnalyzer;
     private final CharacterConceptGenerator characterConceptGenerator;
@@ -90,12 +91,14 @@ public class CharacterService {
 
         String featureSummaryJson = collectFeatureSummary(playlistId);
         if (!v2Enabled) featureSummaryJson = legacySummary(featureSummaryJson);
+        List<CharacterEntity> recentCharacters = v2Enabled
+                ? characterRepository.findTop3ByPlaylist_IdOrderByVersionDesc(playlistId) : List.of();
         CharacterConcept concept = v2Enabled ? characterConceptGenerator.generate(
                 musicProfileAnalyzer.analyze(featureSummaryJson), UUID.randomUUID().getLeastSignificantBits(),
-                getRecentConcepts(playlistId)) : null;
+                getRecentConcepts(recentCharacters)) : null;
         CharacterEditSpec editSpec = concept == null ? legacyEditSpecGenerator.generate(featureSummaryJson) : generateEditSpec(concept);
         CharacterResultMetadata metadata = concept == null ? legacyMetadataGenerator.generate(featureSummaryJson)
-                : characterResultMetadataGenerator.generate(concept);
+                : creativeMetadataGenerator.generate(concept, getRecentMetadata(recentCharacters));
         String generationSpecJson = concept == null ? null : serialize(concept);
         String resultMetadataJson = serialize(metadata);
         String editedCharacterImageUrl = editCharacterImage(editSpec);
@@ -273,9 +276,21 @@ public class CharacterService {
         return legacyMetadataGenerator.generate(character.getFeatureSummaryJson());
     }
 
-    private List<CharacterConcept> getRecentConcepts(Long playlistId) {
+    private List<CharacterResultMetadata> getRecentMetadata(List<CharacterEntity> recentCharacters) {
+        List<CharacterResultMetadata> recent = new ArrayList<>();
+        for (CharacterEntity character : recentCharacters) {
+            try {
+                recent.add(generateResultMetadata(character));
+            } catch (ApiException e) {
+                log.warn("Skipping invalid metadata history: characterId={}", character.getId());
+            }
+        }
+        return recent;
+    }
+
+    private List<CharacterConcept> getRecentConcepts(List<CharacterEntity> recentCharacters) {
         List<CharacterConcept> recent = new ArrayList<>();
-        for (CharacterEntity character : characterRepository.findTop3ByPlaylist_IdOrderByVersionDesc(playlistId)) {
+        for (CharacterEntity character : recentCharacters) {
             if (!StringUtils.hasText(character.getGenerationSpecJson())) continue;
             try {
                 CharacterConcept concept = mapper.readValue(character.getGenerationSpecJson(), CharacterConcept.class);
