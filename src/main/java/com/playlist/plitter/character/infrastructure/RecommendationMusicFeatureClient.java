@@ -3,6 +3,7 @@ package com.playlist.plitter.character.infrastructure;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.playlist.plitter.character.application.port.MusicFeatureClient;
+import com.playlist.plitter.character.application.genre.GenreNormalizer;
 import com.playlist.plitter.character.exception.CharacterErrorCode;
 import com.playlist.plitter.global.exception.ApiException;
 import com.playlist.plitter.playlist.domain.entity.PlaylistEntity;
@@ -56,7 +57,7 @@ public class RecommendationMusicFeatureClient implements MusicFeatureClient {
                         (left, right) -> left
                 ));
 
-        SummaryAccumulator summary = summarize(recommendations, featureByTrackId);
+        SummaryAccumulator summary = summarize(featureByTrackId);
         return toSummaryJson(playlistId, trackIds.size(), featureByTrackId.size(), summary);
     }
 
@@ -73,22 +74,28 @@ public class RecommendationMusicFeatureClient implements MusicFeatureClient {
     }
 
     private SummaryAccumulator summarize(
-            List<RecommendationsEntity> recommendations,
             Map<Long, TrackFeatureEntity> featureByTrackId
     ) {
         SummaryAccumulator summary = new SummaryAccumulator();
-        for (RecommendationsEntity recommendation : recommendations) {
-            TrackFeatureEntity feature = featureByTrackId.get(recommendation.getTrack().getId());
-            if (feature == null) {
-                continue;
-            }
-            if (feature.getEnergy() != null) {
+        for (TrackFeatureEntity feature : featureByTrackId.values()) {
+            boolean validEnergy = isValid(feature.getEnergy());
+            boolean validValence = isValid(feature.getValence());
+            if (validEnergy) {
                 summary.energySum += feature.getEnergy().doubleValue();
                 summary.energyCount++;
+            } else if (feature.getEnergy() != null) {
+                summary.invalidEnergyCount++;
             }
-            if (feature.getValence() != null) {
+            if (validValence) {
                 summary.valenceSum += feature.getValence().doubleValue();
                 summary.valenceCount++;
+            } else if (feature.getValence() != null) {
+                summary.invalidValenceCount++;
+            }
+            if (validEnergy && validValence) summary.validTrackCount++;
+            if (isValid(feature.getConfidence())) {
+                summary.confidenceSum += feature.getConfidence().doubleValue();
+                summary.confidenceCount++;
             }
             String genre = normalizeGenre(feature.getGenre());
             if (genre != null) {
@@ -105,9 +112,17 @@ public class RecommendationMusicFeatureClient implements MusicFeatureClient {
             SummaryAccumulator summary
     ) {
         Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("schemaVersion", 2);
         payload.put("playlistId", playlistId);
         payload.put("trackCount", trackCount);
         payload.put("analyzedTrackCount", analyzedTrackCount);
+        payload.put("featureRowCount", analyzedTrackCount);
+        payload.put("validTrackCount", summary.validTrackCount);
+        payload.put("analysisCoverage", trackCount == 0 ? 0.0 : (double) summary.validTrackCount / trackCount);
+        payload.put("invalidEnergyCount", summary.invalidEnergyCount);
+        payload.put("invalidValenceCount", summary.invalidValenceCount);
+        payload.put("avgConfidence", average(summary.confidenceSum, summary.confidenceCount));
+        payload.put("confidenceCount", summary.confidenceCount);
         payload.put("avgEnergy", average(summary.energySum, summary.energyCount));
         payload.put("avgValence", average(summary.valenceSum, summary.valenceCount));
         payload.put("energyCount", summary.energyCount);
@@ -125,23 +140,30 @@ public class RecommendationMusicFeatureClient implements MusicFeatureClient {
 
     private Double average(double sum, int count) {
         if (count == 0) {
-            return 0.0;
+            return null;
         }
-        return Math.round((sum / count) * 100.0) / 100.0;
+        return sum / count;
     }
 
     private String findPrimaryGenre(Map<String, Integer> genreCounts) {
         return genreCounts.entrySet().stream()
-                .max(Comparator.comparingInt(Map.Entry::getValue))
+                .sorted(Comparator.<Map.Entry<String, Integer>>comparingInt(Map.Entry::getValue).reversed()
+                        .thenComparing(Map.Entry::getKey))
+                .findFirst()
                 .map(Map.Entry::getKey)
-                .orElse("balanced");
+                .orElse("unknown");
     }
 
     private String normalizeGenre(String genre) {
         if (!StringUtils.hasText(genre)) {
             return null;
         }
-        return genre.trim().toLowerCase();
+        String normalized = GenreNormalizer.normalize(genre);
+        return normalized.equals("UNKNOWN") ? null : normalized;
+    }
+
+    private boolean isValid(java.math.BigDecimal value) {
+        return value != null && value.signum() >= 0 && value.compareTo(java.math.BigDecimal.ONE) <= 0;
     }
 
     private static class SummaryAccumulator {
@@ -149,6 +171,11 @@ public class RecommendationMusicFeatureClient implements MusicFeatureClient {
         private int energyCount;
         private double valenceSum;
         private int valenceCount;
+        private int validTrackCount;
+        private int invalidEnergyCount;
+        private int invalidValenceCount;
+        private double confidenceSum;
+        private int confidenceCount;
         private final Map<String, Integer> genreCounts = new LinkedHashMap<>();
     }
 }

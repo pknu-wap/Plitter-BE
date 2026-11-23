@@ -56,7 +56,6 @@ public class S3ImageStorageClient implements ImageStorageClient, DisposableBean 
     private static final int STROKE_RESIDUAL_WHITE_THRESHOLD = 235;
     private static final int STROKE_SOFT_BACKGROUND_THRESHOLD = 220;
     private static final int STROKE_SOFT_BACKGROUND_ALPHA_THRESHOLD = 96;
-    private static final int MIN_STROKE_ALPHA = 170;
 
     private final String bucket;
     private final String keyPrefix;
@@ -195,8 +194,12 @@ public class S3ImageStorageClient implements ImageStorageClient, DisposableBean 
             }
 
             BufferedImage alphaImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            alphaImage.getGraphics().drawImage(image, 0, 0, null);
-            alphaImage.getGraphics().dispose();
+            java.awt.Graphics2D graphics = alphaImage.createGraphics();
+            try {
+                graphics.drawImage(image, 0, 0, null);
+            } finally {
+                graphics.dispose();
+            }
 
             int transparentPixelCount = makeOuterBrightBackgroundTransparent(alphaImage);
             if (transparentPixelCount == 0) {
@@ -294,7 +297,7 @@ public class S3ImageStorageClient implements ImageStorageClient, DisposableBean 
         return transparentCount;
     }
 
-    private void normalizeForegroundStrokes(BufferedImage image) {
+    static void normalizeForegroundStrokes(BufferedImage image) {
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
                 int argb = image.getRGB(x, y);
@@ -316,10 +319,7 @@ public class S3ImageStorageClient implements ImageStorageClient, DisposableBean 
                 }
 
                 int darkness = 255 - luminance;
-                int targetAlpha = Math.max(alpha, Math.min(255, darkness * 2));
-                if (luminance < STROKE_SOFT_BACKGROUND_THRESHOLD) {
-                    targetAlpha = Math.max(targetAlpha, MIN_STROKE_ALPHA);
-                }
+                int targetAlpha = (alpha * darkness + 127) / 255;
 
                 image.setRGB(x, y, (targetAlpha << 24));
             }
