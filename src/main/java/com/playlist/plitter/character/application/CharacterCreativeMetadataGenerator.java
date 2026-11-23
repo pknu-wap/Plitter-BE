@@ -29,7 +29,10 @@ public class CharacterCreativeMetadataGenerator {
         var fallback = fallbackGenerator.generate(concept);
         var fallbackResult = new CharacterResultMetadata(fallback.characterName(),
                 List.of(genreTag, fallback.tags().get(0), fallback.tags().get(2)));
-        if (!client.isAvailable()) return fallbackResult;
+        if (!client.isAvailable()) {
+            log.info("Character metadata fallback: reason=client_unavailable");
+            return fallbackResult;
+        }
 
         var data = catalog.data();
         var request = new CharacterMetadataRequest(concept.profile(), genreTag,
@@ -44,17 +47,20 @@ public class CharacterCreativeMetadataGenerator {
                 generated = client.generate(request);
             } catch (Exception e) {
                 // Do not log provider response bodies: they can contain generated text or credentials.
-                log.warn("Character metadata request failed; using catalog fallback: failure={}",
+                log.warn("Character metadata fallback: reason=provider_error, failure={}",
                         e.getClass().getSimpleName());
                 return fallbackResult;
             }
             try {
-                return validateAndComplete(generated, genreTag, request.recentResults());
+                CharacterResultMetadata result = validateAndComplete(generated, genreTag, request.recentResults());
+                log.info("Character metadata accepted: source=llm");
+                return result;
             } catch (IllegalArgumentException e) {
                 log.warn("Character metadata validation failed: attempt={}, rule={}", attempt + 1, e.getMessage());
                 request = request.withFeedback(e.getMessage() + " Generate a new name and two new tags.");
             }
         }
+        log.warn("Character metadata fallback: reason=validation_exhausted");
         return fallbackResult;
     }
 
