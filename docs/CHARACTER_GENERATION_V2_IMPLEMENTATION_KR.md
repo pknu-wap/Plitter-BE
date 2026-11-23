@@ -75,7 +75,7 @@
 
 생성된 원본을 보존한 채 `output/character-v2/assets/`에 샘플을 복사했다. `image-manifest.json`에 각 편집 지시의 SHA-256을 기록한다. 지시가 바뀌면 미리보기 렌더러가 이전 이미지와 섞어 표시하지 않고 중단한다.
 
-산출물:
+아래 산출물은 이번 로컬 검증에서 만든 파일이며 PR과 운영 배포에는 포함하지 않는다.
 
 - `output/character-v2/gallery.html`: 이미지가 포함된 독립 실행 HTML. 생성 지시 펼쳐 보기 지원.
 - `output/character-v2/preview.png`: 동일 데이터·이미지를 문서 렌더러로 배치한 미리보기. 브라우저 스크린샷이 아니다.
@@ -83,14 +83,13 @@
 - `output/character-v2/image-manifest.json`: 이미지 출처와 지시 해시.
 - `output/character-v2/test-report.txt`: 이번 검증 결과와 범위.
 
-샘플 메타데이터와 화면 재생성:
+Java 생성 규칙의 샘플 메타데이터 추출:
 
 ```bash
 ./gradlew characterV2Preview
-python3 scripts/render-character-v2-preview.py
 ```
 
-화면 렌더러는 기존 샘플 PNG를 읽는다. 샘플 이미지의 재생성은 자동 API 호출로 연결하지 않았다. HTML은 외부 리소스 없이 열 수 있다. PNG 출력은 ReportLab, Poppler와 한국어 폰트를 사용하는 별도 렌더 단계이며, 현재 스크립트에는 macOS의 Arial Unicode 폰트 경로가 설정돼 있다.
+이 명령은 `samples.json`에 입력·콘셉트·프롬프트·이름·태그를 기록한다. 이미지 생성이나 화면 렌더링, DB·S3 호출은 수행하지 않는다. 미리보기 제작용 Python 도구와 관련 패키지는 백엔드 실행에 필요하지 않다.
 
 ## 남은 실환경 검증
 
