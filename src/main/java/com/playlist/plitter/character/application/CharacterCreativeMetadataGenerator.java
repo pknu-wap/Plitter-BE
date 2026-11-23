@@ -19,8 +19,6 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class CharacterCreativeMetadataGenerator {
     private static final Logger log = LoggerFactory.getLogger(CharacterCreativeMetadataGenerator.class);
-    private static final List<String> EXCLUDED_WORDS = List.of(
-            "밤티", "늙크크", "사색적", "초월적", "시발", "씨발", "병신", "지랄", "존나", "좆");
 
     private final CharacterConceptCatalog catalog;
     private final CharacterResultMetadataGenerator fallbackGenerator;
@@ -64,13 +62,13 @@ public class CharacterCreativeMetadataGenerator {
                                                          List<CharacterResultMetadata> recent) {
         if (result == null) throw new IllegalArgumentException("A name and two tags are required.");
         String name = normalize(result.characterName());
-        if (name.length() > 18 || !name.matches("[가-힣A-Za-z0-9 ]+ 스타") || excluded(name))
-            throw new IllegalArgumentException("Use an easy, respectful Korean name ending in ' 스타', up to 18 characters.");
+        if (name.length() > 18 || !name.matches("[가-힣A-Za-z0-9 ]+ 스타"))
+            throw new IllegalArgumentException("Use a name ending in ' 스타', up to 18 characters.");
         if (result.tags() == null || result.tags().size() != 2)
             throw new IllegalArgumentException("Return exactly two tags: mood and personality/situation.");
         List<String> tags = result.tags().stream().map(CharacterCreativeMetadataGenerator::normalizeTag).toList();
         for (String tag : tags) {
-            if (tag.length() > 11 || !tag.matches("[가-힣A-Za-z0-9]+") || excluded(tag))
+            if (tag.length() > 11 || !tag.matches("[가-힣A-Za-z0-9]+"))
                 throw new IllegalArgumentException("Each tag must contain 1-11 letters or digits, with no spaces or punctuation.");
             if (CharacterGenreTag.isGenre(tag))
                 throw new IllegalArgumentException("The server supplies the genre; generate mood and personality/situation tags only.");
@@ -98,9 +96,5 @@ public class CharacterCreativeMetadataGenerator {
     private static String normalizeTag(String value) {
         String tag = normalize(value);
         return tag.startsWith("#") ? tag.substring(1) : tag;
-    }
-
-    private static boolean excluded(String value) {
-        return EXCLUDED_WORDS.stream().anyMatch(value::contains);
     }
 }

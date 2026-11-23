@@ -74,8 +74,6 @@ class CharacterCreativeMetadataGeneratorTest {
                 new CharacterResultMetadata(null, List.of("새벽감성", "혼자엔딩중")),
                 creative("전주부터 사연 있는 별", "새벽감성", "혼자엔딩중"),
                 creative("너무너무 길어서 화면에 전부 담기 어려운 스타", "새벽감성", "혼자엔딩중"),
-                creative("사색적인 스타", "새벽감성", "혼자엔딩중"),
-                creative("밤티 스타", "새벽감성", "혼자엔딩중"),
                 creative("괜히 센치한 스타", "새벽감성", "새벽감성"),
                 creative("괜히 센치한 스타", "POP", "혼자엔딩중"),
                 creative("괜히 센치한 스타", "힙합", "혼자엔딩중"),
