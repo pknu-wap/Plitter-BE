@@ -56,12 +56,3 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
-
-tasks.register('characterV2Preview', JavaExec) {
-    group = 'verification'
-    description = 'Export deterministic V2 character concepts, names, tags and image prompts using local fixtures.'
-    dependsOn testClasses
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.playlist.plitter.character.application.CharacterV2Preview'
-    args layout.projectDirectory.dir('output/character-v2').asFile.absolutePath
-}
