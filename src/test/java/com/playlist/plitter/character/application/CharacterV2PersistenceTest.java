@@ -8,6 +8,7 @@ import com.playlist.plitter.character.application.port.dto.*;
 import com.playlist.plitter.character.domain.entity.CharacterEntity;
 import com.playlist.plitter.character.domain.repository.CharacterRepository;
 import com.playlist.plitter.character.infrastructure.RecommendationMusicFeatureClient;
+import com.playlist.plitter.character.application.dto.CharacterResultMetadata;
 import com.playlist.plitter.playlist.domain.entity.PlaylistEntity;
 import com.playlist.plitter.playlist.domain.repository.PlaylistRepository;
 import com.playlist.plitter.recommendations.domain.entity.RecommendationsEntity;
@@ -42,6 +43,7 @@ class CharacterV2PersistenceTest {
             PlaylistRepository.class, RecommendationsRepository.class, CharacterRepository.class})
     @Import({CharacterService.class, MusicProfileAnalyzer.class, CharacterConceptCatalog.class,
             CharacterConceptGenerator.class, CharacterEditSpecGenerator.class,
+            CharacterCreativeMetadataGenerator.class,
             CharacterResultMetadataGenerator.class, LegacyCharacterResultMetadataGenerator.class,
             LegacyCharacterEditSpecGenerator.class, RecommendationMusicFeatureClient.class})
     static class Config {
@@ -61,12 +63,53 @@ class CharacterV2PersistenceTest {
         @Bean PlatformTransactionManager transactionManager(EntityManagerFactory f) { return new JpaTransactionManager(f); }
         @Bean BaseCharacterClient baseCharacterClient() { return () -> new BaseCharacterImage("test", "classpath:base_character.png"); }
         @Bean CharacterImageEditClient characterImageEditClient() { return request -> "https://fixture.local/generated.png"; }
+        @Bean MetadataClient metadataClient() { return new MetadataClient(); }
         @Bean ImageStorageClient imageStorageClient() {
             return new ImageStorageClient() {
                 public String storeCharacterImage(Long id, String source) { return "https://fixture.local/" + UUID.randomUUID() + ".png"; }
                 public DownloadUrlResult createDownloadUrl(String image) { return new DownloadUrlResult(image+"?download", LocalDateTime.now().plusMinutes(5)); }
             };
         }
+    }
+
+    static class MetadataClient implements CharacterMetadataClient {
+        boolean enabled;
+        int calls;
+        List<CharacterMetadataRequest> requests = new ArrayList<>();
+        CharacterResultMetadata result = new CharacterResultMetadata("전주부터 사연 있는 스타", List.of("새벽감성", "혼자엔딩중"));
+        public boolean isAvailable() { return enabled; }
+        public CharacterResultMetadata generate(CharacterMetadataRequest request) {
+            calls++;
+            requests.add(request);
+            return result;
+        }
+    }
+
+    @Test void freelyGeneratedMetadataIsSavedAndReadsNeverCallLlmAgain() throws Exception {
+        var fixture = fixture(false);
+        var client = context.getBean(MetadataClient.class);
+        client.enabled = true;
+        var service = context.getBean(CharacterService.class);
+
+        var created = service.createCharacter(fixture.id(), fixture.owner());
+        var saved = context.getBean(CharacterRepository.class).findById(created.characterId()).orElseThrow();
+        assertEquals("전주부터 사연 있는 스타", created.characterName());
+        assertEquals(List.of("#발라드", "#새벽감성", "#혼자엔딩중"), created.tags());
+        assertEquals(created.characterName(), mapper.readTree(saved.getResultMetadataJson()).path("characterName").asText());
+        assertEquals(1, client.calls);
+
+        client.enabled = false;
+        assertEquals(created.characterName(), service.getCharacter(fixture.id(), fixture.owner()).characterName());
+        assertEquals(created.tags(), service.getCharacterDownloadUrl(fixture.id(), fixture.owner()).tags());
+        assertEquals(1, client.calls);
+
+        client.enabled = true;
+        client.result = new CharacterResultMetadata("괜히 창밖 보는 스타", List.of("느좋", "생각많은밤"));
+        var next = service.createCharacter(fixture.id(), fixture.owner());
+        assertEquals("괜히 창밖 보는 스타", next.characterName());
+        assertEquals(created.characterName(), client.requests.get(1).recentResults().get(0).characterName());
+        assertEquals(created.tags(), client.requests.get(1).recentResults().get(0).tags());
+        assertEquals(2, client.calls);
     }
 
     @Test void generationPersistsConceptAndMetadataAndAllReadsAgree() throws Exception {
