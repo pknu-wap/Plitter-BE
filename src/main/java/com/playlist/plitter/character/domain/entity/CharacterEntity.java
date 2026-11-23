@@ -49,6 +49,14 @@ public class CharacterEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     private String featureSummaryJson;
 
+    @Column(name = "generation_spec_json", columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private String generationSpecJson;
+
+    @Column(name = "result_metadata_json", columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private String resultMetadataJson;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -79,5 +87,15 @@ public class CharacterEntity {
             String featureSummaryJson
     ) {
         return new CharacterEntity(playlist, version, imageUrl, promptText, featureSummaryJson);
+    }
+
+    public static CharacterEntity create(
+            PlaylistEntity playlist, int version, String imageUrl, String promptText,
+            String featureSummaryJson, String generationSpecJson, String resultMetadataJson
+    ) {
+        CharacterEntity character = create(playlist, version, imageUrl, promptText, featureSummaryJson);
+        character.generationSpecJson = generationSpecJson;
+        character.resultMetadataJson = resultMetadataJson;
+        return character;
     }
 }

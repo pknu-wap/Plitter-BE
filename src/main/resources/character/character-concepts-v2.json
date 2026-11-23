@@ -1,0 +1,645 @@
+{
+  "version": "v2",
+  "moods": {
+    "LOW_LOW": {
+      "expressions": [
+        "soft_smile",
+        "eyes_closed",
+        "shy_smile"
+      ],
+      "poses": [
+        "sway",
+        "seated",
+        "listening",
+        "slow_step"
+      ],
+      "marks": [
+        "none",
+        "two_notes",
+        "small_motion"
+      ],
+      "names": [
+        "괜히 센치한 스타",
+        "유난히 촉촉한 스타",
+        "은근 감성적인 스타",
+        "괜히 조용한 스타",
+        "오늘따라 잔잔한 스타",
+        "살짝 말랑한 스타"
+      ],
+      "tags": [
+        [
+          "새벽감성",
+          "감성충전",
+          "센치모드"
+        ],
+        [
+          "이불속콘서트",
+          "창가플리",
+          "이어폰필수"
+        ],
+        [
+          "무한반복",
+          "과몰입중",
+          "한곡더"
+        ]
+      ]
+    },
+    "LOW_MID": {
+      "expressions": [
+        "easy_smile",
+        "half_smile",
+        "eyes_closed"
+      ],
+      "poses": [
+        "sway",
+        "seated",
+        "listening",
+        "slow_step"
+      ],
+      "marks": [
+        "none",
+        "two_notes",
+        "small_motion"
+      ],
+      "names": [
+        "유난히 느긋한 스타",
+        "한없이 편안한 스타",
+        "은근 여유로운 스타",
+        "느낌 있는 스타",
+        "묘하게 포근한 스타",
+        "오늘따라 차분한 스타"
+      ],
+      "tags": [
+        [
+          "느좋",
+          "여유만렙",
+          "차분모드"
+        ],
+        [
+          "카페플리",
+          "이불속콘서트",
+          "이어폰필수"
+        ],
+        [
+          "무한반복",
+          "멍때리기좋은",
+          "플리산책"
+        ]
+      ]
+    },
+    "LOW_HIGH": {
+      "expressions": [
+        "warm_smile",
+        "happy_eyes",
+        "soft_smile"
+      ],
+      "poses": [
+        "sway",
+        "seated",
+        "listening",
+        "slow_step"
+      ],
+      "marks": [
+        "none",
+        "two_notes",
+        "sparkles"
+      ],
+      "names": [
+        "유난히 말랑한 스타",
+        "괜히 기분 좋은 스타",
+        "은근 포근한 스타",
+        "묘하게 몽글한 스타",
+        "한없이 따뜻한 스타",
+        "살짝 들뜬 스타"
+      ],
+      "tags": [
+        [
+          "말랑말랑",
+          "힐링중",
+          "기분좋은"
+        ],
+        [
+          "이불속콘서트",
+          "햇살플리",
+          "이어폰필수"
+        ],
+        [
+          "무한반복",
+          "살랑살랑",
+          "한곡더"
+        ]
+      ]
+    },
+    "MID_LOW": {
+      "expressions": [
+        "focused",
+        "half_smile",
+        "shy_smile"
+      ],
+      "poses": [
+        "sway",
+        "side_step",
+        "toe_tap",
+        "hand_wave"
+      ],
+      "marks": [
+        "none",
+        "two_notes",
+        "small_motion"
+      ],
+      "names": [
+        "괜히 센치한 스타",
+        "은근 진지한 스타",
+        "살짝 쿨한 스타",
+        "묘하게 시크한 스타",
+        "오늘따라 감성적인 스타",
+        "대놓고 분위기 있는 스타"
+      ],
+      "tags": [
+        [
+          "새벽감성",
+          "감성충전",
+          "센치모드"
+        ],
+        [
+          "이불속콘서트",
+          "창가플리",
+          "이어폰필수"
+        ],
+        [
+          "무한반복",
+          "과몰입중",
+          "한곡더"
+        ]
+      ]
+    },
+    "MID_MID": {
+      "expressions": [
+        "half_smile",
+        "easy_smile",
+        "playful"
+      ],
+      "poses": [
+        "sway",
+        "side_step",
+        "toe_tap",
+        "hand_wave"
+      ],
+      "marks": [
+        "none",
+        "two_notes",
+        "small_motion"
+      ],
+      "names": [
+        "은근 뻔뻔한 스타",
+        "대놓고 힙한 스타",
+        "묘하게 쿨한 스타",
+        "유난히 여유로운 스타",
+        "은근 멋있는 스타",
+        "괜히 당당한 스타"
+      ],
+      "tags": [
+        [
+          "느좋",
+          "은근흥부자",
+          "기분전환"
+        ],
+        [
+          "방구석콘서트",
+          "출근길플리",
+          "이어폰필수"
+        ],
+        [
+          "내적댄스",
+          "무한반복",
+          "둠칫둠칫"
+        ]
+      ]
+    },
+    "MID_HIGH": {
+      "expressions": [
+        "happy_eyes",
+        "playful",
+        "warm_smile"
+      ],
+      "poses": [
+        "sway",
+        "side_step",
+        "toe_tap",
+        "hand_wave"
+      ],
+      "marks": [
+        "sparkles",
+        "two_notes",
+        "small_motion"
+      ],
+      "names": [
+        "묘하게 잔망스러운 스타",
+        "유난히 발랄한 스타",
+        "은근 장난스러운 스타",
+        "괜히 신나는 스타",
+        "대놓고 상큼한 스타",
+        "살짝 뻔뻔한 스타"
+      ],
+      "tags": [
+        [
+          "텐션업",
+          "흥부자",
+          "기분업"
+        ],
+        [
+          "혼자페스티벌",
+          "방구석콘서트",
+          "출근길플리"
+        ],
+        [
+          "못멈춰",
+          "둠칫둠칫",
+          "한곡더"
+        ]
+      ]
+    },
+    "HIGH_LOW": {
+      "expressions": [
+        "focused",
+        "bold_smirk",
+        "half_smile"
+      ],
+      "poses": [
+        "jump",
+        "bounce",
+        "side_step",
+        "reach"
+      ],
+      "marks": [
+        "none",
+        "two_notes",
+        "small_motion"
+      ],
+      "names": [
+        "쓸데없이 비장한 스타",
+        "대놓고 강렬한 스타",
+        "은근 짜릿한 스타",
+        "오늘따라 거친 스타",
+        "괜히 당당한 스타",
+        "유난히 뜨거운 스타"
+      ],
+      "tags": [
+        [
+          "볼륨주의",
+          "텐션만렙",
+          "강렬한취향"
+        ],
+        [
+          "방구석헤드라이너",
+          "혼자페스티벌",
+          "이어폰필수"
+        ],
+        [
+          "플리과몰입",
+          "못멈춰",
+          "한곡더"
+        ]
+      ]
+    },
+    "HIGH_MID": {
+      "expressions": [
+        "bold_smirk",
+        "playful",
+        "focused"
+      ],
+      "poses": [
+        "jump",
+        "bounce",
+        "side_step",
+        "reach"
+      ],
+      "marks": [
+        "sparkles",
+        "two_notes",
+        "small_motion"
+      ],
+      "names": [
+        "대놓고 힙한 스타",
+        "은근 뻔뻔한 스타",
+        "괜히 당당한 스타",
+        "유난히 짜릿한 스타",
+        "살짝 건방진 스타",
+        "묘하게 멋있는 스타"
+      ],
+      "tags": [
+        [
+          "느좋",
+          "은근흥부자",
+          "기분전환"
+        ],
+        [
+          "방구석콘서트",
+          "출근길플리",
+          "이어폰필수"
+        ],
+        [
+          "내적댄스",
+          "무한반복",
+          "둠칫둠칫"
+        ]
+      ]
+    },
+    "HIGH_HIGH": {
+      "expressions": [
+        "big_smile",
+        "happy_eyes",
+        "playful"
+      ],
+      "poses": [
+        "jump",
+        "bounce",
+        "side_step",
+        "reach"
+      ],
+      "marks": [
+        "sparkles",
+        "two_notes",
+        "small_motion"
+      ],
+      "names": [
+        "묘하게 잔망스러운 스타",
+        "대놓고 신나는 스타",
+        "유난히 발랄한 스타",
+        "괜히 들뜬 스타",
+        "은근 짜릿한 스타",
+        "오늘따라 뻔뻔한 스타"
+      ],
+      "tags": [
+        [
+          "텐션업",
+          "흥부자",
+          "기분업"
+        ],
+        [
+          "혼자페스티벌",
+          "방구석콘서트",
+          "출근길플리"
+        ],
+        [
+          "못멈춰",
+          "둠칫둠칫",
+          "한곡더"
+        ]
+      ]
+    },
+    "UNKNOWN": {
+      "expressions": [
+        "easy_smile",
+        "half_smile",
+        "soft_smile"
+      ],
+      "poses": [
+        "sway",
+        "side_step",
+        "toe_tap",
+        "hand_wave"
+      ],
+      "marks": [
+        "none",
+        "two_notes",
+        "small_motion"
+      ],
+      "names": [
+        "느낌 있는 스타",
+        "은근 개성 있는 스타",
+        "묘하게 색다른 스타",
+        "괜히 특별한 스타",
+        "유난히 친근한 스타",
+        "대놓고 자유로운 스타"
+      ],
+      "tags": [
+        [
+          "음악친구",
+          "취향수집중",
+          "플리탐험"
+        ],
+        [
+          "이어폰필수",
+          "나만의플리",
+          "음악있는하루"
+        ],
+        [
+          "한곡더",
+          "플리저장",
+          "음악듣는중"
+        ]
+      ]
+    }
+  },
+  "genres": {
+    "K_POP": [
+      "mini_mic",
+      "note_badge"
+    ],
+    "HIP_HOP": [
+      "mini_mic",
+      "small_record"
+    ],
+    "RNB": [
+      "small_record",
+      "music_player"
+    ],
+    "ELECTRONIC_DANCE": [
+      "small_record",
+      "rhythm_shaker"
+    ],
+    "POP": [
+      "mini_mic",
+      "music_player"
+    ],
+    "ROCK": [
+      "guitar_pick",
+      "tiny_guitar"
+    ],
+    "METAL": [
+      "guitar_pick",
+      "tiny_guitar"
+    ],
+    "JAZZ": [
+      "small_record",
+      "tiny_horn"
+    ],
+    "BALLAD": [
+      "small_record",
+      "music_player"
+    ],
+    "INDIE": [
+      "tiny_guitar",
+      "note_badge"
+    ],
+    "CLASSICAL": [
+      "baton",
+      "music_book"
+    ],
+    "ACOUSTIC": [
+      "tiny_guitar",
+      "music_book"
+    ],
+    "FOLK": [
+      "tiny_guitar",
+      "rhythm_shaker"
+    ],
+    "OTHER": [
+      "music_player",
+      "note_badge"
+    ],
+    "UNKNOWN": [
+      "music_player",
+      "note_badge"
+    ]
+  },
+  "expressions": {
+    "soft_smile": {
+      "directive": "A tiny gentle smile with relaxed eyes.",
+      "weight": 3
+    },
+    "eyes_closed": {
+      "directive": "Eyes softly closed, absorbed in the music.",
+      "weight": 2
+    },
+    "shy_smile": {
+      "directive": "A small shy smile and an understated face.",
+      "weight": 1
+    },
+    "easy_smile": {
+      "directive": "A relaxed easygoing smile.",
+      "weight": 3
+    },
+    "half_smile": {
+      "directive": "An understated confident half-smile.",
+      "weight": 2
+    },
+    "warm_smile": {
+      "directive": "A warm friendly smile.",
+      "weight": 3
+    },
+    "happy_eyes": {
+      "directive": "Small happy crescent eyes and a light smile.",
+      "weight": 2
+    },
+    "focused": {
+      "directive": "A focused expression with simple determined eyes.",
+      "weight": 3
+    },
+    "bold_smirk": {
+      "directive": "A cheeky confident smirk; keep the face tiny.",
+      "weight": 2
+    },
+    "playful": {
+      "directive": "A mischievous playful expression.",
+      "weight": 2
+    },
+    "big_smile": {
+      "directive": "A lively open happy smile with minimal facial detail.",
+      "weight": 3
+    }
+  },
+  "poses": {
+    "sway": {
+      "directive": "Gently sway sideways with relaxed stick limbs.",
+      "weight": 3
+    },
+    "seated": {
+      "directive": "Sit casually with tiny stick legs out front; retain the full star body.",
+      "weight": 1
+    },
+    "listening": {
+      "directive": "Stand quietly with a slight head/body tilt as if listening closely.",
+      "weight": 2
+    },
+    "slow_step": {
+      "directive": "Take one slow small walking step with relaxed arms.",
+      "weight": 2
+    },
+    "side_step": {
+      "directive": "Make a small rhythmic side-step with asymmetrical limbs.",
+      "weight": 3
+    },
+    "toe_tap": {
+      "directive": "Tap one tiny foot to the beat, with a modest body lean.",
+      "weight": 3
+    },
+    "hand_wave": {
+      "directive": "Wave one tiny free hand naturally while enjoying the beat.",
+      "weight": 1
+    },
+    "jump": {
+      "directive": "Make one light joyful jump, showing both tiny feet and the whole star.",
+      "weight": 2
+    },
+    "bounce": {
+      "directive": "Bounce with bent stick knees and asymmetrical arms.",
+      "weight": 3
+    },
+    "reach": {
+      "directive": "Reach the free arm upward in a compact lively performance pose.",
+      "weight": 2
+    }
+  },
+  "props": {
+    "small_record": {
+      "directive": "Hold one tiny vinyl record, smaller than half the star body.",
+      "weight": 3
+    },
+    "note_badge": {
+      "directive": "Wear one tiny outlined music-note badge, smaller than the face area.",
+      "weight": 2
+    },
+    "mini_mic": {
+      "directive": "Hold one tiny simple microphone, smaller than half the star body.",
+      "weight": 3
+    },
+    "music_player": {
+      "directive": "Hold one tiny outlined portable music player, with no lettering.",
+      "weight": 2
+    },
+    "guitar_pick": {
+      "directive": "Hold one small outlined guitar pick, with no text.",
+      "weight": 3
+    },
+    "tiny_guitar": {
+      "directive": "Hold one extremely simple miniature guitar, no larger than half the star body.",
+      "weight": 2
+    },
+    "baton": {
+      "directive": "Hold one small thin conductor baton as the sole main prop.",
+      "weight": 3
+    },
+    "music_book": {
+      "directive": "Hold one small outlined music booklet with sparse abstract note marks, not words.",
+      "weight": 2
+    },
+    "tiny_horn": {
+      "directive": "Hold one tiny simplified jazz horn, no larger than half the star body.",
+      "weight": 2
+    },
+    "rhythm_shaker": {
+      "directive": "Hold one tiny outlined rhythm shaker, with no solid black fill.",
+      "weight": 2
+    }
+  },
+  "marks": {
+    "none": {
+      "directive": "Add no surrounding marks.",
+      "weight": 1
+    },
+    "two_notes": {
+      "directive": "Add exactly two tiny sparse music notes near the free side.",
+      "weight": 3
+    },
+    "small_motion": {
+      "directive": "Add two short tiny motion marks that fit the selected pose.",
+      "weight": 2
+    },
+    "sparkles": {
+      "directive": "Add two tiny hand-drawn outline sparkles.",
+      "weight": 2
+    }
+  }
+}
