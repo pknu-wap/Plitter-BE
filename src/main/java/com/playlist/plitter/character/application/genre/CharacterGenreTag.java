@@ -16,9 +16,4 @@ public final class CharacterGenreTag {
     public static String from(String genre) {
         return "#" + LABELS.getOrDefault(GenreNormalizer.normalize(genre), "장르믹스");
     }
-
-    public static boolean isGenre(String value) {
-        return LABELS.containsValue(value) || value.equals("장르믹스") || value.equals("락")
-                || LABELS.containsKey(GenreNormalizer.normalize(value));
-    }
 }

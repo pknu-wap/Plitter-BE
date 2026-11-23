@@ -52,19 +52,24 @@ public class CharacterConceptCatalog {
             checkIds(m.expressions(), data.expressions(), 3);
             checkIds(m.poses(), data.poses(), 4);
             checkIds(m.marks(), data.marks(), 3);
-            if (m.names().size() < 6 || new HashSet<>(m.names()).size() != m.names().size())
+            if (m.names().size() < 20 || new HashSet<>(m.names()).size() != m.names().size())
                 throw new IllegalArgumentException("Need distinct names: " + mood);
             for (String name : m.names())
                 if (!name.endsWith(" 스타") || name.length() > 18)
                     throw new IllegalArgumentException("Invalid name: " + name);
             if (m.tags().size() != 3 || m.tags().stream().anyMatch(t -> t.size() < 3))
                 throw new IllegalArgumentException("Need three tag pools");
-            Set<String> allTags = new HashSet<>();
-            for (List<String> pool : m.tags()) for (String tag : pool) {
-                if (tag.isBlank() || tag.length() > 11 || tag.startsWith("#")
-                        || tag.chars().anyMatch(Character::isWhitespace) || !allTags.add(tag))
-                    throw new IllegalArgumentException("Invalid or duplicate tag: " + tag);
+            for (List<String> pool : m.tags()) {
+                Set<String> distinctTags = new HashSet<>();
+                for (String tag : pool) {
+                    if (tag.isBlank() || tag.length() > 11 || tag.startsWith("#")
+                            || tag.chars().anyMatch(Character::isWhitespace) || !distinctTags.add(tag))
+                        throw new IllegalArgumentException("Invalid or duplicate tag: " + tag);
+                }
             }
+            // Pool 1 preserves legacy listening tags; pool 2 also includes them for the new last tag.
+            if (!Collections.disjoint(m.tags().get(0), m.tags().get(2)))
+                throw new IllegalArgumentException("Displayed mood and reaction tags must be distinct");
             for (List<String> props : data.genres().values()) {
                 checkIds(props, data.props(), 2);
                 if ((long)m.expressions().size() * m.poses().size() * m.marks().size() * props.size() < 24)
