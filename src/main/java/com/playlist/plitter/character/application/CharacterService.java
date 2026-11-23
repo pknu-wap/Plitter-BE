@@ -54,7 +54,6 @@ public class CharacterService {
     private final MusicFeatureClient musicFeatureClient;
     private final CharacterEditSpecGenerator characterEditSpecGenerator;
     private final CharacterResultMetadataGenerator characterResultMetadataGenerator;
-    private final CharacterCreativeMetadataGenerator creativeMetadataGenerator;
     private final LegacyCharacterResultMetadataGenerator legacyMetadataGenerator;
     private final MusicProfileAnalyzer musicProfileAnalyzer;
     private final CharacterConceptGenerator characterConceptGenerator;
@@ -95,10 +94,10 @@ public class CharacterService {
                 ? characterRepository.findTop3ByPlaylist_IdOrderByVersionDesc(playlistId) : List.of();
         CharacterConcept concept = v2Enabled ? characterConceptGenerator.generate(
                 musicProfileAnalyzer.analyze(featureSummaryJson), UUID.randomUUID().getLeastSignificantBits(),
-                getRecentConcepts(recentCharacters)) : null;
+                getRecentConcepts(recentCharacters), getRecentMetadata(recentCharacters)) : null;
         CharacterEditSpec editSpec = concept == null ? legacyEditSpecGenerator.generate(featureSummaryJson) : generateEditSpec(concept);
         CharacterResultMetadata metadata = concept == null ? legacyMetadataGenerator.generate(featureSummaryJson)
-                : creativeMetadataGenerator.generate(concept, getRecentMetadata(recentCharacters));
+                : characterResultMetadataGenerator.generate(concept);
         String generationSpecJson = concept == null ? null : serialize(concept);
         String resultMetadataJson = serialize(metadata);
         String editedCharacterImageUrl = editCharacterImage(editSpec);
