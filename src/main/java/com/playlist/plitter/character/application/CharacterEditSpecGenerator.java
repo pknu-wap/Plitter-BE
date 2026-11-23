@@ -19,14 +19,20 @@ public class CharacterEditSpecGenerator {
                 Preserve the simple five-point star body, tiny minimal face, thin stick arms and legs,
                 tiny hands and feet, awkward uneven asymmetry, and rough naive hand-drawn identity.
                 Music genre: %s. Mood group: %s.
+                Use the input as the drawing-style and character-identity reference.
+                Build the planned stance anew: clearly change the torso tilt, leg spacing and free-arm position.
+                Make the chosen expression, overall pose and prop easy to distinguish at thumbnail size.
                 Apply this exact planned concept:
                 - Expression: %s
                 - Pose: %s
                 - Sole main prop or accessory: %s
                 - Surrounding marks: %s
                 Keep one full-body character. Keep the face visible and the star silhouette recognizable.
-                Use at most one main prop/accessory, smaller than half the star body.
-                An attached accessory must be smaller than the face area. Add no more than three tiny marks.
+                Follow the selected pose even when the input reference is standing upright.
+                Keep sitting, kneeling, balancing, leaning and jumping stances visibly different.
+                Use at most one main prop/accessory. A handheld prop must be smaller than half the star body.
+                Simple worn headphones or outlined eyewear may frame the face; keep eyes, mouth and star points visible.
+                Leave the remaining body uncluttered. Add no more than three tiny surrounding marks.
                 Keep thin wobbly uneven black lines and small naive irregularities.
                 Use a fully transparent alpha background. No words, letters, labels or captions in the image.
                 No colors, shading, gradients, 3D, paper texture, solid black filled areas or complex clothing.

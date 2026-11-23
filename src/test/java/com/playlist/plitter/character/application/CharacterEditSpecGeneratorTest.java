@@ -117,9 +117,59 @@ class CharacterEditSpecGeneratorTest {
                 assertTrue(m.tags().stream().allMatch(t -> t.startsWith("#") && t.length() <= 12));
                 assertEquals(mood.name(), prompts.generate(c).styleTone());
                 assertTrue(prompts.generate(c).promptText().contains(catalog.data().props().get(c.propId()).directive()));
+                assertTrue(prompts.generate(c).promptText().contains(catalog.data().poses().get(c.poseId()).directive()));
+                assertTrue(prompts.generate(c).promptText().contains(catalog.data().expressions().get(c.expressionId()).directive()));
             }
-            assertTrue(signatures.size() >= 16, mood + "/" + genre + " only " + signatures.size());
+            assertTrue(signatures.size() >= 100, mood + "/" + genre + " only " + signatures.size());
         }
+    }
+
+    @Test void recentCharactersUseDifferentPoseAndPropFamiliesAcrossProfiles() {
+        for (Mood mood : Mood.values()) for (String genre : catalog.data().genres().keySet()) {
+            var profile = new MusicProfile(mood, genre, .5, .5, 5, 5, 5);
+            List<CharacterConcept> recent = new ArrayList<>();
+            for (int seed = 0; seed < 16; seed++) {
+                var c = concepts.generate(profile, seed, recent);
+                for (var old : recent) {
+                    assertNotEquals(catalog.data().poses().get(old.poseId()).family(),
+                            catalog.data().poses().get(c.poseId()).family(), mood + "/" + genre + " repeats pose family");
+                    assertNotEquals(catalog.data().props().get(old.propId()).family(),
+                            catalog.data().props().get(c.propId()).family(), mood + "/" + genre + " repeats prop family");
+                }
+                if (!recent.isEmpty())
+                    assertNotEquals(catalog.data().expressions().get(recent.get(0).expressionId()).family(),
+                            catalog.data().expressions().get(c.expressionId()).family());
+                recent.add(0, c);
+                recent = new ArrayList<>(recent.stream().limit(3).toList());
+            }
+        }
+    }
+
+    @Test void similarLookingAccessoriesAndSittingPosesAreNotTreatedAsNewFamilies() {
+        var profile = analyzer.analyze(summary(.2, .5, 5, "ballad"));
+        var old = new CharacterConcept(2, "v2", "v2", "v2", 1, profile,
+                "eyes_closed", "seated", "small_headphones", "none", "LOW_MID:0",
+                List.of("느좋", "카페플리", "무한반복"));
+        for (int seed = 0; seed < 200; seed++) {
+            var next = concepts.generate(profile, seed, List.of(old));
+            assertNotEquals("small_headphones", next.propId());
+            assertNotEquals("tiny_earbuds", next.propId());
+            assertNotEquals("seated", next.poseId());
+            assertNotEquals("cross_legged", next.poseId());
+        }
+    }
+
+    @Test void oldStoredVisualIdsRemainUsableWithTheExpandedCatalog() {
+        var profile = analyzer.analyze(summary(.2, .2, 5, "ballad"));
+        var old = new CharacterConcept(2, "v2", "v2", "v2", 1, profile,
+                "eyes_closed", "seated", "music_player", "two_notes", "LOW_LOW:0",
+                List.of("새벽감성", "창가플리", "과몰입중"));
+        assertEquals("괜히 센치한 스타", metadata.generate(old).characterName());
+        assertTrue(prompts.generate(old).promptText().contains(catalog.data().props().get("music_player").directive()));
+        var next = concepts.generate(profile, 42, List.of(old));
+        assertNotEquals("seated", catalog.data().poses().get(next.poseId()).family());
+        assertNotEquals("player", catalog.data().props().get(next.propId()).family());
+        assertNotEquals("closed", catalog.data().expressions().get(next.expressionId()).family());
     }
 
     @Test void replaysSeedAndAvoidsThreeRecentNamesAndVisuals() {
