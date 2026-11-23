@@ -10,7 +10,7 @@ import java.util.*;
 
 @Component
 public class CharacterConceptCatalog {
-    public record Option(String directive, int weight) {}
+    public record Option(String directive, int weight, String family) {}
     public record MoodOptions(List<String> expressions, List<String> poses, List<String> marks,
                               List<String> names, List<List<String>> tags) {}
     public record Catalog(String version, Map<String, MoodOptions> moods, Map<String, List<String>> genres,
@@ -43,15 +43,18 @@ public class CharacterConceptCatalog {
         for (Map<String, Option> options : List.of(data.expressions(), data.poses(), data.props(), data.marks())) {
             options.forEach((id, option) -> {
                 if (id.isBlank() || option.directive() == null || option.directive().isBlank()
+                        || option.family() == null || option.family().isBlank()
                         || option.weight() < 1 || option.weight() > 100)
                     throw new IllegalArgumentException("Invalid option: " + id);
             });
         }
         for (Mood mood : Mood.values()) {
             MoodOptions m = Objects.requireNonNull(mood(mood), "Missing mood " + mood);
-            checkIds(m.expressions(), data.expressions(), 3);
-            checkIds(m.poses(), data.poses(), 4);
-            checkIds(m.marks(), data.marks(), 3);
+            checkIds(m.expressions(), data.expressions(), 6);
+            checkIds(m.poses(), data.poses(), 8);
+            checkIds(m.marks(), data.marks(), 4);
+            checkFamilies(m.expressions(), data.expressions(), 3);
+            checkFamilies(m.poses(), data.poses(), 4);
             if (m.names().size() < 20 || new HashSet<>(m.names()).size() != m.names().size())
                 throw new IllegalArgumentException("Need distinct names: " + mood);
             for (String name : m.names())
@@ -71,8 +74,9 @@ public class CharacterConceptCatalog {
             if (!Collections.disjoint(m.tags().get(0), m.tags().get(2)))
                 throw new IllegalArgumentException("Displayed mood and reaction tags must be distinct");
             for (List<String> props : data.genres().values()) {
-                checkIds(props, data.props(), 2);
-                if ((long)m.expressions().size() * m.poses().size() * m.marks().size() * props.size() < 24)
+                checkIds(props, data.props(), 6);
+                checkFamilies(props, data.props(), 4);
+                if ((long)m.expressions().size() * m.poses().size() * m.marks().size() * props.size() < 1000)
                     throw new IllegalArgumentException("Too few combinations");
             }
         }
@@ -81,5 +85,10 @@ public class CharacterConceptCatalog {
     private static void checkIds(List<String> ids, Map<String, Option> options, int minimum) {
         if (ids.size() < minimum || new HashSet<>(ids).size() != ids.size()
                 || !options.keySet().containsAll(ids)) throw new IllegalArgumentException("Invalid option references");
+    }
+
+    private static void checkFamilies(List<String> ids, Map<String, Option> options, int minimum) {
+        if (ids.stream().map(id -> options.get(id).family()).distinct().count() < minimum)
+            throw new IllegalArgumentException("Too few visually distinct option families");
     }
 }

@@ -11,11 +11,10 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 public class CharacterConceptGenerator {
+    private static final String VISUAL_VERSION = "v2-visual-variety";
     private final CharacterConceptCatalog catalog;
 
-    private record Visual(String expression, String pose, String prop, String marks, long weight) {
-        String signature() { return String.join("/", expression, pose, prop, marks); }
-    }
+    private record Visual(String expression, String pose, String prop, String marks, long weight) {}
 
     public CharacterConcept generate(MusicProfile profile, long seed, List<CharacterConcept> recent) {
         return generate(profile, seed, recent, List.of());
@@ -35,9 +34,16 @@ public class CharacterConceptGenerator {
         List<CharacterConcept> history = recent.stream().limit(3).toList();
         List<Visual> eligible = List.of();
         for (int keep = history.size(); keep >= 0 && eligible.isEmpty(); keep--) {
-            Set<String> signatures = new HashSet<>();
-            history.subList(0, keep).forEach(c -> signatures.add(c.signature()));
-            eligible = all.stream().filter(v -> !signatures.contains(v.signature())).toList();
+            Set<String> poseFamilies = new HashSet<>();
+            Set<String> propFamilies = new HashSet<>();
+            history.subList(0, keep).forEach(c -> {
+                poseFamilies.add(family(d.poses(), c.poseId()));
+                propFamilies.add(family(d.props(), c.propId()));
+            });
+            String lastExpression = keep == 0 ? null : family(d.expressions(), history.get(0).expressionId());
+            eligible = all.stream().filter(v -> !poseFamilies.contains(family(d.poses(), v.pose()))
+                    && !propFamilies.contains(family(d.props(), v.prop()))
+                    && !Objects.equals(lastExpression, family(d.expressions(), v.expression()))).toList();
         }
         Random random = new Random(mixSeed(seed));
         long total = eligible.stream().mapToLong(Visual::weight).sum();
@@ -80,11 +86,16 @@ public class CharacterConceptGenerator {
         // Retain the original middle tag slot so V2 concepts remain compatible with stored history.
         var listeningTags = sorted(m.tags().get(1)).stream().filter(tag -> !pair.contains(tag)).toList();
         List<String> tags = List.of(pair.get(0), listeningTags.get(random.nextInt(listeningTags.size())), pair.get(1));
-        return new CharacterConcept(2, "v2", "v2", d.version(), seed, profile,
+        return new CharacterConcept(2, VISUAL_VERSION, VISUAL_VERSION, d.version(), seed, profile,
                 selected.expression(), selected.pose(), selected.prop(), selected.marks(), nameId, tags);
     }
 
     private static List<String> sorted(List<String> values) { return values.stream().sorted().toList(); }
+
+    private static String family(Map<String, CharacterConceptCatalog.Option> options, String id) {
+        var option = options.get(id);
+        return option == null ? id : option.family();
+    }
 
     private static String tagPairKey(String first, String second) {
         return List.of(first.replaceFirst("^#", "").toLowerCase(Locale.ROOT),

@@ -5,18 +5,26 @@
       "expressions": [
         "soft_smile",
         "eyes_closed",
-        "shy_smile"
+        "shy_smile",
+        "sleepy_eyes",
+        "tiny_pout",
+        "wistful_eyes"
       ],
       "poses": [
         "sway",
         "seated",
         "listening",
-        "slow_step"
+        "slow_step",
+        "cross_legged",
+        "kneeling",
+        "gentle_bow",
+        "restful_lean"
       ],
       "marks": [
         "none",
         "two_notes",
-        "small_motion"
+        "small_motion",
+        "one_note"
       ],
       "names": [
         "괜히 센치한 스타",
@@ -70,18 +78,26 @@
       "expressions": [
         "easy_smile",
         "half_smile",
-        "eyes_closed"
+        "eyes_closed",
+        "sleepy_eyes",
+        "curious_eyes",
+        "content_grin"
       ],
       "poses": [
         "sway",
         "seated",
         "listening",
-        "slow_step"
+        "slow_step",
+        "cross_legged",
+        "kneeling",
+        "gentle_bow",
+        "restful_lean"
       ],
       "marks": [
         "none",
         "two_notes",
-        "small_motion"
+        "small_motion",
+        "rhythm_ticks"
       ],
       "names": [
         "유난히 느긋한 스타",
@@ -135,18 +151,26 @@
       "expressions": [
         "warm_smile",
         "happy_eyes",
-        "soft_smile"
+        "soft_smile",
+        "blushing_smile",
+        "content_grin",
+        "wink"
       ],
       "poses": [
         "sway",
         "seated",
         "listening",
-        "slow_step"
+        "slow_step",
+        "cross_legged",
+        "kneeling",
+        "gentle_bow",
+        "restful_lean"
       ],
       "marks": [
         "none",
         "two_notes",
-        "sparkles"
+        "sparkles",
+        "tiny_heart"
       ],
       "names": [
         "유난히 말랑한 스타",
@@ -201,18 +225,26 @@
       "expressions": [
         "focused",
         "half_smile",
-        "shy_smile"
+        "shy_smile",
+        "tiny_pout",
+        "wistful_eyes",
+        "determined_brows"
       ],
       "poses": [
         "sway",
         "side_step",
         "toe_tap",
-        "hand_wave"
+        "hand_wave",
+        "one_leg_balance",
+        "cross_legged",
+        "diagonal_lean",
+        "half_turn"
       ],
       "marks": [
         "none",
         "two_notes",
-        "small_motion"
+        "small_motion",
+        "one_note"
       ],
       "names": [
         "괜히 센치한 스타",
@@ -266,18 +298,26 @@
       "expressions": [
         "half_smile",
         "easy_smile",
-        "playful"
+        "playful",
+        "wink",
+        "cheeky_grin",
+        "curious_eyes"
       ],
       "poses": [
         "sway",
         "side_step",
         "toe_tap",
-        "hand_wave"
+        "hand_wave",
+        "one_leg_balance",
+        "cross_legged",
+        "diagonal_lean",
+        "half_turn"
       ],
       "marks": [
         "none",
         "two_notes",
-        "small_motion"
+        "small_motion",
+        "rhythm_ticks"
       ],
       "names": [
         "은근 뻔뻔한 스타",
@@ -331,18 +371,26 @@
       "expressions": [
         "happy_eyes",
         "playful",
-        "warm_smile"
+        "warm_smile",
+        "wink",
+        "laughing_eyes",
+        "surprised_o"
       ],
       "poses": [
         "sway",
         "side_step",
         "toe_tap",
-        "hand_wave"
+        "hand_wave",
+        "one_leg_balance",
+        "cross_legged",
+        "diagonal_lean",
+        "half_turn"
       ],
       "marks": [
         "sparkles",
         "two_notes",
-        "small_motion"
+        "small_motion",
+        "tiny_heart"
       ],
       "names": [
         "묘하게 잔망스러운 스타",
@@ -396,18 +444,26 @@
       "expressions": [
         "focused",
         "bold_smirk",
-        "half_smile"
+        "half_smile",
+        "determined_brows",
+        "open_mouth_sing",
+        "cheeky_grin"
       ],
       "poses": [
         "jump",
         "bounce",
         "side_step",
-        "reach"
+        "reach",
+        "wide_stride",
+        "one_leg_balance",
+        "kneeling_performer",
+        "diagonal_lean"
       ],
       "marks": [
         "none",
         "two_notes",
-        "small_motion"
+        "small_motion",
+        "motion_arc"
       ],
       "names": [
         "쓸데없이 비장한 스타",
@@ -461,18 +517,26 @@
       "expressions": [
         "bold_smirk",
         "playful",
-        "focused"
+        "focused",
+        "wink",
+        "open_mouth_sing",
+        "cheeky_grin"
       ],
       "poses": [
         "jump",
         "bounce",
         "side_step",
-        "reach"
+        "reach",
+        "wide_stride",
+        "one_leg_balance",
+        "kneeling_performer",
+        "diagonal_lean"
       ],
       "marks": [
         "sparkles",
         "two_notes",
-        "small_motion"
+        "small_motion",
+        "rhythm_ticks"
       ],
       "names": [
         "대놓고 힙한 스타",
@@ -526,18 +590,26 @@
       "expressions": [
         "big_smile",
         "happy_eyes",
-        "playful"
+        "playful",
+        "laughing_eyes",
+        "surprised_o",
+        "open_mouth_sing"
       ],
       "poses": [
         "jump",
         "bounce",
         "side_step",
-        "reach"
+        "reach",
+        "wide_stride",
+        "one_leg_balance",
+        "kneeling_performer",
+        "diagonal_lean"
       ],
       "marks": [
         "sparkles",
         "two_notes",
-        "small_motion"
+        "small_motion",
+        "motion_arc"
       ],
       "names": [
         "묘하게 잔망스러운 스타",
@@ -591,18 +663,26 @@
       "expressions": [
         "easy_smile",
         "half_smile",
-        "soft_smile"
+        "soft_smile",
+        "curious_eyes",
+        "wink",
+        "content_grin"
       ],
       "poses": [
         "sway",
         "side_step",
         "toe_tap",
-        "hand_wave"
+        "hand_wave",
+        "one_leg_balance",
+        "cross_legged",
+        "diagonal_lean",
+        "half_turn"
       ],
       "marks": [
         "none",
         "two_notes",
-        "small_motion"
+        "small_motion",
+        "one_note"
       ],
       "names": [
         "느낌 있는 스타",
@@ -656,211 +736,491 @@
   "genres": {
     "K_POP": [
       "mini_mic",
-      "note_badge"
+      "note_badge",
+      "small_headphones",
+      "tambourine",
+      "outline_sunglasses",
+      "tiny_speaker"
     ],
     "HIP_HOP": [
       "mini_mic",
-      "small_record"
+      "small_record",
+      "small_headphones",
+      "outline_sunglasses",
+      "tiny_speaker",
+      "cassette_tape"
     ],
     "RNB": [
       "small_record",
-      "music_player"
+      "music_player",
+      "small_headphones",
+      "tiny_keyboard",
+      "tiny_earbuds",
+      "mini_mic"
     ],
     "ELECTRONIC_DANCE": [
       "small_record",
-      "rhythm_shaker"
+      "rhythm_shaker",
+      "small_headphones",
+      "tiny_keyboard",
+      "tiny_speaker",
+      "tambourine"
     ],
     "POP": [
       "mini_mic",
-      "music_player"
+      "music_player",
+      "small_headphones",
+      "tambourine",
+      "tiny_keyboard",
+      "cassette_tape"
     ],
     "ROCK": [
       "guitar_pick",
-      "tiny_guitar"
+      "tiny_guitar",
+      "small_headphones",
+      "drumsticks",
+      "tambourine",
+      "outline_sunglasses"
     ],
     "METAL": [
       "guitar_pick",
-      "tiny_guitar"
+      "tiny_guitar",
+      "small_headphones",
+      "drumsticks",
+      "tiny_speaker",
+      "outline_sunglasses"
     ],
     "JAZZ": [
       "small_record",
-      "tiny_horn"
+      "tiny_horn",
+      "tiny_keyboard",
+      "tiny_bow_tie",
+      "tiny_harmonica",
+      "small_headphones"
     ],
     "BALLAD": [
       "small_record",
-      "music_player"
+      "music_player",
+      "small_headphones",
+      "tiny_earbuds",
+      "tiny_keyboard",
+      "cassette_tape"
     ],
     "INDIE": [
       "tiny_guitar",
-      "note_badge"
+      "note_badge",
+      "small_headphones",
+      "cassette_tape",
+      "tiny_harmonica",
+      "tambourine"
     ],
     "CLASSICAL": [
       "baton",
-      "music_book"
+      "music_book",
+      "tiny_violin",
+      "tiny_flute",
+      "tiny_bow_tie",
+      "small_headphones"
     ],
     "ACOUSTIC": [
       "tiny_guitar",
-      "music_book"
+      "music_book",
+      "tiny_harmonica",
+      "tambourine",
+      "tiny_flute",
+      "small_headphones"
     ],
     "FOLK": [
       "tiny_guitar",
-      "rhythm_shaker"
+      "rhythm_shaker",
+      "tiny_harmonica",
+      "tambourine",
+      "tiny_flute",
+      "small_headphones"
     ],
     "OTHER": [
       "music_player",
-      "note_badge"
+      "note_badge",
+      "small_headphones",
+      "small_record",
+      "tambourine",
+      "cassette_tape"
     ],
     "UNKNOWN": [
       "music_player",
-      "note_badge"
+      "note_badge",
+      "small_headphones",
+      "small_record",
+      "tambourine",
+      "cassette_tape"
     ]
   },
   "expressions": {
     "soft_smile": {
       "directive": "A tiny gentle smile with relaxed eyes.",
-      "weight": 3
+      "weight": 3,
+      "family": "smile"
     },
     "eyes_closed": {
       "directive": "Eyes softly closed, absorbed in the music.",
-      "weight": 2
+      "weight": 2,
+      "family": "closed"
     },
     "shy_smile": {
       "directive": "A small shy smile and an understated face.",
-      "weight": 1
+      "weight": 1,
+      "family": "shy"
     },
     "easy_smile": {
       "directive": "A relaxed easygoing smile.",
-      "weight": 3
+      "weight": 3,
+      "family": "smile"
     },
     "half_smile": {
       "directive": "An understated confident half-smile.",
-      "weight": 2
+      "weight": 2,
+      "family": "smirk"
     },
     "warm_smile": {
       "directive": "A warm friendly smile.",
-      "weight": 3
+      "weight": 3,
+      "family": "smile"
     },
     "happy_eyes": {
       "directive": "Small happy crescent eyes and a light smile.",
-      "weight": 2
+      "weight": 2,
+      "family": "happy"
     },
     "focused": {
       "directive": "A focused expression with simple determined eyes.",
-      "weight": 3
+      "weight": 3,
+      "family": "focused"
     },
     "bold_smirk": {
       "directive": "A cheeky confident smirk; keep the face tiny.",
-      "weight": 2
+      "weight": 2,
+      "family": "smirk"
     },
     "playful": {
       "directive": "A mischievous playful expression.",
-      "weight": 2
+      "weight": 2,
+      "family": "smirk"
     },
     "big_smile": {
       "directive": "A lively open happy smile with minimal facial detail.",
-      "weight": 3
+      "weight": 3,
+      "family": "happy"
+    },
+    "sleepy_eyes": {
+      "directive": "Half-lidded sleepy eyes and one small relaxed curved mouth; keep all facial lines sparse.",
+      "weight": 2,
+      "family": "drowsy"
+    },
+    "tiny_pout": {
+      "directive": "Two tiny lowered eyes and a small outlined pout, gently sulky rather than angry.",
+      "weight": 2,
+      "family": "pout"
+    },
+    "wistful_eyes": {
+      "directive": "Tiny eyes glancing slightly upward with one short wistful mouth line.",
+      "weight": 2,
+      "family": "wistful"
+    },
+    "curious_eyes": {
+      "directive": "Two small open curious eyes, one slightly higher than the other, and a tiny rounded mouth.",
+      "weight": 2,
+      "family": "curious"
+    },
+    "wink": {
+      "directive": "One eye drawn as a small closed curve, the other open, with a tiny crooked grin.",
+      "weight": 2,
+      "family": "wink"
+    },
+    "content_grin": {
+      "directive": "Relaxed closed curved eyes and one broad but tiny contented grin, with no filled mouth.",
+      "weight": 2,
+      "family": "grin"
+    },
+    "blushing_smile": {
+      "directive": "A small shy smile and two short outlined cheek ticks; keep the face minimal.",
+      "weight": 2,
+      "family": "shy"
+    },
+    "determined_brows": {
+      "directive": "Two short determined eyebrow strokes above tiny eyes and a compact serious mouth.",
+      "weight": 2,
+      "family": "focused"
+    },
+    "open_mouth_sing": {
+      "directive": "A tiny outlined O-shaped singing mouth with lively open eyes; no solid black mouth fill.",
+      "weight": 2,
+      "family": "singing"
+    },
+    "laughing_eyes": {
+      "directive": "Two small squeezed laughing eyes and a tiny open laughing mouth drawn only in outline.",
+      "weight": 2,
+      "family": "laughing"
+    },
+    "cheeky_grin": {
+      "directive": "One slightly raised eyebrow and an off-centre cheeky grin; retain the tiny naive face.",
+      "weight": 2,
+      "family": "smirk"
+    },
+    "surprised_o": {
+      "directive": "Two tiny round surprised eyes and a small outlined O mouth; keep the surprise playful.",
+      "weight": 2,
+      "family": "surprised"
     }
   },
   "poses": {
     "sway": {
       "directive": "Gently sway sideways with relaxed stick limbs.",
-      "weight": 3
+      "weight": 3,
+      "family": "sway"
     },
     "seated": {
       "directive": "Sit casually with tiny stick legs out front; retain the full star body.",
-      "weight": 1
+      "weight": 1,
+      "family": "seated"
     },
     "listening": {
       "directive": "Stand quietly with a slight head/body tilt as if listening closely.",
-      "weight": 2
+      "weight": 2,
+      "family": "standing"
     },
     "slow_step": {
       "directive": "Take one slow small walking step with relaxed arms.",
-      "weight": 2
+      "weight": 2,
+      "family": "walking"
     },
     "side_step": {
       "directive": "Make a small rhythmic side-step with asymmetrical limbs.",
-      "weight": 3
+      "weight": 3,
+      "family": "dancing"
     },
     "toe_tap": {
       "directive": "Tap one tiny foot to the beat, with a modest body lean.",
-      "weight": 3
+      "weight": 3,
+      "family": "tapping"
     },
     "hand_wave": {
       "directive": "Wave one tiny free hand naturally while enjoying the beat.",
-      "weight": 1
+      "weight": 1,
+      "family": "waving"
     },
     "jump": {
       "directive": "Make one light joyful jump, showing both tiny feet and the whole star.",
-      "weight": 2
+      "weight": 2,
+      "family": "jumping"
     },
     "bounce": {
       "directive": "Bounce with bent stick knees and asymmetrical arms.",
-      "weight": 3
+      "weight": 3,
+      "family": "dancing"
     },
     "reach": {
       "directive": "Reach the free arm upward in a compact lively performance pose.",
-      "weight": 2
+      "weight": 2,
+      "family": "reaching"
+    },
+    "cross_legged": {
+      "directive": "Sit low with the two thin legs visibly crossed in front, free hand resting to the side and the full five-point body upright.",
+      "weight": 2,
+      "family": "seated"
+    },
+    "kneeling": {
+      "directive": "Kneel on one tiny knee with the other foot forward, lowering the whole star close to the feet; leave the free arm relaxed.",
+      "weight": 2,
+      "family": "kneeling"
+    },
+    "gentle_bow": {
+      "directive": "Tilt the whole star forward about 25 degrees in a gentle bow, with bent thin knees and a loose free arm; keep the face visible.",
+      "weight": 2,
+      "family": "bowing"
+    },
+    "restful_lean": {
+      "directive": "Lean the whole star backward about 25 degrees with one tiny leg stretched forward and the free arm hanging loosely.",
+      "weight": 2,
+      "family": "leaning"
+    },
+    "one_leg_balance": {
+      "directive": "Balance on one clearly bent thin leg, lift the other leg out to the side and extend the free arm for balance.",
+      "weight": 2,
+      "family": "balancing"
+    },
+    "diagonal_lean": {
+      "directive": "Tilt the whole star diagonally about 30 degrees, plant the feet far apart and extend the free arm away from the body.",
+      "weight": 3,
+      "family": "leaning"
+    },
+    "half_turn": {
+      "directive": "Use a flat front-visible half-turn stance: point the thin feet in different directions and swing the free arm behind the star.",
+      "weight": 2,
+      "family": "turning"
+    },
+    "wide_stride": {
+      "directive": "Take an exaggerated wide walking stride, with one tiny foot far forward, the other back and the whole star leaning into the step.",
+      "weight": 2,
+      "family": "walking"
+    },
+    "kneeling_performer": {
+      "directive": "Make a compact one-knee performance stance with the other leg extended and the free arm raised, keeping the full star and both feet visible.",
+      "weight": 2,
+      "family": "kneeling"
     }
   },
   "props": {
     "small_record": {
       "directive": "Hold one tiny vinyl record, smaller than half the star body.",
-      "weight": 3
+      "weight": 3,
+      "family": "record"
     },
     "note_badge": {
       "directive": "Wear one tiny outlined music-note badge, smaller than the face area.",
-      "weight": 2
+      "weight": 2,
+      "family": "badge"
     },
     "mini_mic": {
       "directive": "Hold one tiny simple microphone, smaller than half the star body.",
-      "weight": 3
+      "weight": 3,
+      "family": "microphone"
     },
     "music_player": {
       "directive": "Hold one tiny outlined portable music player, with no lettering.",
-      "weight": 2
+      "weight": 2,
+      "family": "player"
     },
     "guitar_pick": {
       "directive": "Hold one small outlined guitar pick, with no text.",
-      "weight": 3
+      "weight": 3,
+      "family": "pick"
     },
     "tiny_guitar": {
       "directive": "Hold one extremely simple miniature guitar, no larger than half the star body.",
-      "weight": 2
+      "weight": 2,
+      "family": "strings"
     },
     "baton": {
       "directive": "Hold one small thin conductor baton as the sole main prop.",
-      "weight": 3
+      "weight": 3,
+      "family": "stick"
     },
     "music_book": {
       "directive": "Hold one small outlined music booklet with sparse abstract note marks, not words.",
-      "weight": 2
+      "weight": 2,
+      "family": "book"
     },
     "tiny_horn": {
       "directive": "Hold one tiny simplified jazz horn, no larger than half the star body.",
-      "weight": 2
+      "weight": 2,
+      "family": "horn"
     },
     "rhythm_shaker": {
       "directive": "Hold one tiny outlined rhythm shaker, with no solid black fill.",
-      "weight": 2
+      "weight": 2,
+      "family": "shaker"
+    },
+    "small_headphones": {
+      "directive": "Wear one simple outlined headphone set around the sides of the face; leave eyes, mouth and all five star points visible.",
+      "weight": 2,
+      "family": "listening"
+    },
+    "tiny_earbuds": {
+      "directive": "Wear one small outlined earbud set with a single loose curved wire, keeping the face and star outline unobstructed.",
+      "weight": 2,
+      "family": "listening"
+    },
+    "tiny_keyboard": {
+      "directive": "Carry one miniature outlined keyboard diagonally in one hand, no wider than half the star body; use a few simple keys and no stand.",
+      "weight": 2,
+      "family": "keyboard"
+    },
+    "tambourine": {
+      "directive": "Hold one small outlined tambourine ring with three tiny jingle details, smaller than half the star body.",
+      "weight": 2,
+      "family": "tambourine"
+    },
+    "drumsticks": {
+      "directive": "Hold one short pair of outlined drumsticks together in one hand as a single accessory; add no drum or stand.",
+      "weight": 2,
+      "family": "stick"
+    },
+    "tiny_harmonica": {
+      "directive": "Hold one tiny outlined harmonica with a few simple holes beside the face, without covering the mouth or eyes.",
+      "weight": 2,
+      "family": "harmonica"
+    },
+    "tiny_flute": {
+      "directive": "Carry one small outlined flute diagonally beside the body, smaller than half the star body and clear of the face.",
+      "weight": 2,
+      "family": "flute"
+    },
+    "cassette_tape": {
+      "directive": "Hold one tiny outlined cassette tape with two small empty reel circles and no text, smaller than half the star body.",
+      "weight": 2,
+      "family": "cassette"
+    },
+    "tiny_speaker": {
+      "directive": "Hold one tiny outlined speaker box with two simple driver circles; add no floor, cables or lettering.",
+      "weight": 2,
+      "family": "speaker"
+    },
+    "tiny_violin": {
+      "directive": "Carry one small simply outlined violin in one hand, no larger than half the star body; add no separate bow.",
+      "weight": 2,
+      "family": "strings"
+    },
+    "outline_sunglasses": {
+      "directive": "Wear one thin outlined angular sunglasses frame with empty transparent lenses; keep the tiny eyes, mouth and star points visible.",
+      "weight": 1,
+      "family": "eyewear"
+    },
+    "tiny_bow_tie": {
+      "directive": "Wear one small outlined bow tie immediately below the face as the sole accessory, with no jacket or other clothing.",
+      "weight": 2,
+      "family": "neck_accessory"
     }
   },
   "marks": {
     "none": {
       "directive": "Add no surrounding marks.",
-      "weight": 1
+      "weight": 1,
+      "family": "none"
     },
     "two_notes": {
       "directive": "Add exactly two tiny sparse music notes near the free side.",
-      "weight": 3
+      "weight": 3,
+      "family": "notes"
     },
     "small_motion": {
       "directive": "Add two short tiny motion marks that fit the selected pose.",
-      "weight": 2
+      "weight": 2,
+      "family": "motion"
     },
     "sparkles": {
       "directive": "Add two tiny hand-drawn outline sparkles.",
-      "weight": 2
+      "weight": 2,
+      "family": "sparkles"
+    },
+    "one_note": {
+      "directive": "Add one tiny outlined music note near the free upper side, well separated from the face.",
+      "weight": 2,
+      "family": "notes"
+    },
+    "tiny_heart": {
+      "directive": "Add one small unfilled hand-drawn heart beside the free side of the character.",
+      "weight": 2,
+      "family": "heart"
+    },
+    "rhythm_ticks": {
+      "directive": "Add three short sparse rhythm ticks near the moving foot or free hand; no glow or ground line.",
+      "weight": 2,
+      "family": "motion"
+    },
+    "motion_arc": {
+      "directive": "Add one short curved motion arc beside the free arm; keep it separate from the star outline.",
+      "weight": 2,
+      "family": "motion"
     }
   }
 }
